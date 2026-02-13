@@ -1,153 +1,369 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>This Is Serious 😤❤️</title>
-
-<style>
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Georgia', serif;
-    background: radial-gradient(circle at center, #ff4e50, #1c1c1c);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    overflow: hidden;
-    color: white;
-}
-
-.container {
-    max-width: 500px;
-}
-
-h1 {
-    font-size: 2rem;
-    margin-bottom: 30px;
-}
-
-button {
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 18px;
-    border-radius: 40px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-#yesBtn {
-    background: #00ff88;
-    color: black;
-    font-weight: bold;
-}
-
-#noBtn {
-    background: #444;
-    color: white;
-    position: absolute;
-}
-
-.message {
-    margin-top: 20px;
-    font-size: 18px;
-    min-height: 40px;
-}
-
-.confetti {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    background: white;
-    top: 0;
-    animation: fall 3s linear forwards;
-}
-
-@keyframes fall {
-    to {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Will you be my Valentine, DVK? 💘</title>
+  <meta name="description" content="A playful Valentine's Day page with a tricky YES and a growing NO." />
+  <meta name="theme-color" content="#ff2e63" />
+  <style>
+    /* ==============================
+       Valentine’s Styles 💖
+    ===============================*/
+    :root{
+      --bg1:#ffdee9;
+      --bg2:#b5fffc;
+      --pink:#ff4d8d;
+      --rose:#ff6fa3;
+      --red:#ff2e63;
+      --dark:#2c2c35;
+      --white:#fff;
+      --shadow: 0 20px 40px rgba(0,0,0,.12);
+      --shadow-soft: 0 10px 25px rgba(0,0,0,.10);
     }
-}
-</style>
+
+    *{ box-sizing:border-box; }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--dark);
+      background: radial-gradient(1200px 600px at 20% 0%,#fff0f6,transparent 70%),
+                  radial-gradient(800px 500px at 90% 20%,#e6fffb,transparent 60%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    main.card{
+      max-width: 760px;
+      margin: 5vh auto;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3.5vw, 36px);
+      position: relative;
+    }
+
+    h1{
+      font-size: clamp(28px, 4.6vw, 48px);
+      line-height: 1.15;
+      margin: 0 0 6px 0;
+    }
+
+    .sub{
+      margin: 0 0 24px 0;
+      opacity: .8;
+      font-size: clamp(14px, 2.5vw, 18px);
+    }
+
+    .accent{ color: var(--red); font-weight: 800; }
+
+    .buttons{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 140px;
+      padding: 8px;
+    }
+
+    .btn{
+      cursor: pointer;
+      font-size: clamp(18px, 3.5vw, 22px);
+      padding: 14px 22px;
+      border-radius: 14px;
+      border: none;
+      box-shadow: var(--shadow-soft);
+      transition: transform .15s ease, box-shadow .15s ease, background .2s ease, color .2s ease;
+      background: #fff;
+      user-select: none;
+    }
+
+    .btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 24px rgba(0,0,0,.12); }
+
+    .btn:disabled{
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn.yes{
+      background: linear-gradient(135deg, #fff, #ffe8f1);
+      border: 2px solid #ffd0e0;
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .btn.no{
+      background: #ffffff;
+      border: 2px dashed #ffb9d1;
+      color: #6f6f7a;
+      font-weight: 700;
+    }
+
+    .btn.primary{
+      background: var(--red);
+      color: #fff;
+    }
+
+    .taunt{
+      min-height: 28px;
+      margin: 14px 2px 6px;
+      font-size: clamp(14px, 2.4vw, 18px);
+      color: #7a7a86;
+    }
+
+    .tiny{
+      margin-top: 18px;
+      font-size: 12px;
+      opacity: .65;
+    }
+
+    .overlay{
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 240, 246, .88);
+      z-index: 50;
+    }
+    .overlay[hidden]{ display: none; }
+
+    .overlay-card{
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px;
+      max-width: 560px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    #hearts{
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    .buttons .btn.floating{
+      position: absolute;
+      will-change: transform, top, left;
+    }
+
+    .heart{
+      position: absolute;
+      width: 14px; height: 14px;
+      transform: rotate(45deg);
+      background: var(--pink);
+      box-shadow: 0 6px 16px rgba(255,0,85,.25);
+      animation: floatUp linear forwards;
+    }
+
+    .heart::before,
+    .heart::after{
+      content: "";
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: inherit;
+      top: -7px; left: 0;
+    }
+    .heart::after{ left: -7px; top: 0; }
+
+    @keyframes floatUp{
+      0% { opacity: 0; transform: translateY(0) rotate(45deg) scale(.6); }
+      10%{ opacity: 1; }
+      100%{ opacity: 0; transform: translateY(-110vh) rotate(45deg) scale(1.2); }
+    }
+
+    @media (max-width: 520px){
+      .buttons{ grid-template-columns: 1fr; gap: 10px; min-height: 180px; }
+      .buttons .btn.floating{ position: absolute; }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="card" id="stage">
+    <header>
+      <h1>Will you be my Valentine, <span class="accent">DVK</span>? 💝</h1>
+      <p class="sub">Answer honestly… but no speedruns 😏</p>
+    </header>
 
-<div class="container">
-    <h1 id="question">Will You Be My Valentine? ❤️</h1>
-    <button id="yesBtn">Yes 😌</button>
-    <button id="noBtn">No 😐</button>
-    <div class="message" id="dramaText"></div>
-</div>
+    <section class="buttons" id="buttonsArea">
+      <button id="yesBtn" class="btn yes">YES 💞</button>
+      <button id="noBtn" class="btn no">NO 🙃</button>
+    </section>
 
-<script>
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const dramaText = document.getElementById("dramaText");
-const question = document.getElementById("question");
+    <p id="taunt" class="taunt"></p>
 
-let noCount = 0;
+    <footer class="tiny">
+      Made with 💗 by <span class="accent">Kyavand</span>
+    </footer>
+  </main>
 
-const dramaticLines = [
-    "Oh… okay. That hurt a little.",
-    "Are you sure? Like… emotionally sure?",
-    "I already told my mom you’d say yes.",
-    "My playlist is literally called 'Us Forever'.",
-    "This is getting awkward.",
-    "You’re clicking no like it pays you.",
-    "Do you enjoy chaos?",
-    "I will dramatically stare out of a window now.",
-    "Fine. I see how it is.",
-    "Last chance before I write poetry about this."
-];
+  <div id="successOverlay" class="overlay" hidden>
+    <div class="overlay-card">
+      <h2>She said <span class="accent">YES</span>! 🎉</h2>
+      <p>You’re my favorite notification. Always have been. 💘</p>
+      <button class="btn primary" id="replayBtn">Replay hearts</button>
+    </div>
+  </div>
 
-// Move No button + escalate drama
-noBtn.addEventListener("mouseover", () => {
-    noCount++;
+  <div id="hearts"></div>
 
-    const x = Math.random() * (window.innerWidth - 100);
-    const y = Math.random() * (window.innerHeight - 50);
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
+  <script>
+    /* ==============================
+       Valentine’s Mischief Logic
+    ================================*/
 
-    if (noCount <= dramaticLines.length) {
-        dramaText.textContent = dramaticLines[noCount - 1];
-    } else {
-        dramaText.textContent = "At this point the Yes button is your only option.";
+    const YES_FAST_MS = 5000;
+    const MISCHIEF_MIN_MS = 8000;
+    const REQUIRED_TAUNTS = 5;
+
+    const NO_GROWTH_BASE = 1.03;
+    const NO_MAX_SCALE = 3.5;
+    const NO_TICK_MS = 180;
+
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const tauntEl = document.getElementById('taunt');
+    const buttonsArea = document.getElementById('buttonsArea');
+    const overlay = document.getElementById('successOverlay');
+    const heartsLayer = document.getElementById('hearts');
+    const replayBtn = document.getElementById('replayBtn');
+
+    const startTime = performance.now();
+    let mischief = false;
+    let allowRealYes = false;
+    let tauntIndex = 0;
+    let tauntsShown = 0;
+    let noScale = 1.0;
+
+    const TAUNTS = [
+      "Whoa, that was fast! Did you even read the terms & conditions? 😏",
+      "Speedrun any% detected. Not today—Cupid says no skips. 🏃‍♀️💨",
+      "Patience, my love—romance is a slow-cooked stew. 🍲💘",
+      "You can’t just mash YES like it’s a cookie pop-up. 🍪",
+      "Catch the button if you can. It’s shy but flattered. 😉",
+      "Okay okay, I like your enthusiasm… try again (for real). 💗",
+      "Almost there! The real YES appears when your heart says ‘duh’. ❤️",
+    ];
+
+    function timeElapsedMs(){ return performance.now() - startTime; }
+
+    function updateNoGrowth(){
+      const seconds = timeElapsedMs() / 1000;
+      noScale = Math.min(NO_MAX_SCALE, Math.pow(NO_GROWTH_BASE, seconds));
+      noBtn.style.transform = `scale(${noScale})`;
+    }
+    const growthInterval = setInterval(updateNoGrowth, NO_TICK_MS);
+    updateNoGrowth();
+
+    function showTaunt(){
+      const msg = TAUNTS[tauntIndex % TAUNTS.length];
+      tauntIndex++;
+      tauntsShown++;
+      tauntEl.textContent = msg;
     }
 
-    // Make YES button grow dramatically
-    let scale = 1 + (noCount * 0.15);
-    yesBtn.style.transform = `scale(${scale})`;
-});
-
-// YES clicked
-yesBtn.addEventListener("click", () => {
-    question.textContent = "I KNEW IT 😭❤️";
-    dramaText.textContent = "This is the best day of my entire existence.";
-    noBtn.style.display = "none";
-    yesBtn.style.display = "none";
-    launchConfetti();
-});
-
-// Confetti function
-function launchConfetti() {
-    for (let i = 0; i < 100; i++) {
-        const confetti = document.createElement("div");
-        confetti.classList.add("confetti");
-        confetti.style.left = Math.random() * 100 + "vw";
-        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
-        document.body.appendChild(confetti);
-
-        setTimeout(() => confetti.remove(), 5000);
+    function scrambleButtons(){
+      const area = buttonsArea.getBoundingClientRect();
+      [yesBtn, noBtn].forEach(btn=>{
+        const b = btn.getBoundingClientRect();
+        const maxLeft = area.width - b.width;
+        const maxTop = area.height - b.height;
+        btn.style.left = (Math.random()*maxLeft)+"px";
+        btn.style.top = (Math.random()*maxTop)+"px";
+        btn.style.transition = "top .22s ease, left .22s ease";
+      });
     }
-}
-</script>
 
+    function startMischief(){
+      if (mischief) return;
+      mischief = true;
+
+      yesBtn.classList.add("floating");
+      noBtn.classList.add("floating");
+
+      ["mouseenter","touchstart"].forEach(evt=>{
+        yesBtn.addEventListener(evt, scrambleButtons, {passive:true});
+        noBtn.addEventListener(evt, scrambleButtons, {passive:true});
+      });
+
+      scrambleButtons();
+
+      const remainingFast = Math.max(0, YES_FAST_MS - timeElapsedMs());
+      const minChaos = Math.max(MISCHIEF_MIN_MS, remainingFast);
+
+      setTimeout(()=> maybeUnlockRealYes(), minChaos);
+    }
+
+    function maybeUnlockRealYes(){
+      if (tauntsShown >= REQUIRED_TAUNTS){
+        allowRealYes = true;
+        tauntEl.textContent = "Alright, alright—you’ve earned a real YES now. 💞";
+      } else {
+        const check = setInterval(()=>{
+          if (tauntsShown >= REQUIRED_TAUNTS){
+            clearInterval(check);
+            allowRealYes = true;
+            tauntEl.textContent = "Okay, Cupid approves. Real YES unlocked! 💘";
+          }
+        }, 1000);
+      }
+    }
+
+    function spawnHearts(count=60){
+      const colors = ["#ff4d8d","#ff6fa3","#ff2e63","#ff9ac2","#ffb3cf"];
+      const w = window.innerWidth;
+      for (let i=0;i<count;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        const size = 10 + Math.random()*16;
+        h.style.width = h.style.height = size+"px";
+        h.style.left = Math.random()*(w-20)+"px";
+        h.style.bottom = "-30px";
+        h.style.background = colors[i % colors.length];
+        h.style.animationDuration = (5+Math.random()*3)+"s";
+        h.style.animationDelay = (Math.random()*0.6)+"s";
+        heartsLayer.appendChild(h);
+        setTimeout(()=>h.remove(), 8000);
+      }
+    }
+
+    function celebrate(){
+      overlay.hidden = false;
+      spawnHearts(90);
+    }
+
+    replayBtn.addEventListener("click", ()=> spawnHearts(70));
+
+    yesBtn.addEventListener("click", ()=>{
+      if (!allowRealYes){
+        if (timeElapsedMs() < YES_FAST_MS || mischief){
+          showTaunt();
+          startMischief();
+          scrambleButtons();
+          return;
+        }
+      }
+      celebrate();
+      clearInterval(growthInterval);
+      tauntEl.textContent = "Best decision ever. 💗";
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+    });
+
+    noBtn.addEventListener("click", ()=>{
+      showTaunt();
+      noScale = Math.min(NO_MAX_SCALE, noScale * 1.05);
+      noBtn.style.transform = `scale(${noScale})`;
+    });
+  </script>
 </body>
 </html>
