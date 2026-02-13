@@ -4,12 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Will you be my Valentine, DVK? 💘</title>
-  <meta name="description" content="Chaotic (mobile-only) Valentine with time-limited decoys, a growing NO, and extra snark." />
+  <meta name="description" content="Mobile-only chaotic Valentine with time-limited decoys, countdown, golden YES finale, and a romantic ending." />
   <meta name="theme-color" content="#ff2e63" />
   <style>
     :root{
       --bg1:#ffdee9; --bg2:#b5fffc; --pink:#ff4d8d; --rose:#ff6fa3; --red:#ff2e63;
       --dark:#2c2c35; --white:#fff; --shadow:0 20px 40px rgba(0,0,0,.12); --shadow-soft:0 10px 25px rgba(0,0,0,.10);
+      --gold1:#ffdd66; --gold2:#ffb347; --gold3:#ffd700;
     }
     *{ box-sizing:border-box; }
     html,body{
@@ -33,7 +34,7 @@
     .buttons{
       display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
       align-items: center; justify-content: center; position: relative;
-      min-height: 190px; padding: 10px; overflow: visible;
+      min-height: 210px; padding: 10px; overflow: visible;
     }
     .btn{
       cursor: pointer; font-size: clamp(18px,3.5vw,22px);
@@ -47,19 +48,55 @@
     .btn.yes{ background: linear-gradient(135deg, #fff, #ffe8f1); border: 2px solid #ffd0e0; color: var(--red); font-weight: 800; }
     .btn.no{ background: #fff; border: 2px dashed #ffb9d1; color: #6f6f7a; font-weight: 700; }
     .btn.primary{ background: var(--red); color: #fff; }
-    .taunt{ min-height: 32px; margin: 16px 2px 8px; font-size: clamp(14px,2.4vw,18px); color: #7a7a86; }
+
+    /* Countdown chip */
+    .chip{
+      position: absolute;
+      right: 12px; top: 12px;
+      background: #fff3fa;
+      color: #a7004e;
+      border: 1px solid #ffc2dc;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      box-shadow: var(--shadow-soft);
+      display: inline-flex; align-items: center; gap: 8px;
+      z-index: 5;
+    }
+    .chip .dot{ width:8px; height:8px; border-radius:50%; background:#ff5aa5; box-shadow: 0 0 0 0 rgba(255,90,165,.8); animation: ping 1.4s infinite; }
+    @keyframes ping{ 100%{ box-shadow: 0 0 0 10px rgba(255,90,165,0); } }
+
+    .taunt{ min-height: 36px; margin: 16px 2px 8px; font-size: clamp(14px,2.4vw,18px); color: #7a7a86; }
     .tiny{ margin-top: 18px; font-size: 12px; opacity: .65; }
     .overlay{
       position: fixed; inset: 0; display: grid; place-items: center;
       background: rgba(255,240,246,.88); z-index: 50; backdrop-filter: blur(3px);
     }
     .overlay[hidden]{ display:none; }
-    .overlay-card{ background:#fff; border-radius:18px; padding:24px; max-width:560px; text-align:center; box-shadow: var(--shadow); }
+    .overlay-card{ background:#fff; border-radius:18px; padding:24px; max-width:620px; text-align:center; box-shadow: var(--shadow); }
 
     #hearts, #sparkles{ position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 40; }
 
     /* Chaos floating mode */
     .buttons .btn.floating, .decoy{ position: absolute !important; will-change: transform, top, left; z-index: 3; }
+
+    /* Golden YES finale */
+    .golden-yes{
+      background: linear-gradient(135deg, var(--gold1), var(--gold2));
+      border: 2px solid #f7c948;
+      color: #6b3a00;
+      font-weight: 900;
+      text-shadow: 0 1px 0 rgba(255,255,255,.5);
+      box-shadow: 0 12px 24px rgba(248, 191, 60, .35), inset 0 0 0 2px rgba(255,255,255,.4);
+      animation: glow 1.2s ease-in-out infinite alternate, floaty 2.2s ease-in-out infinite;
+    }
+    @keyframes glow{
+      from{ filter: drop-shadow(0 0 0 rgba(255,215,0,0.0)); }
+      to  { filter: drop-shadow(0 0 12px rgba(255,215,0,0.75)); }
+    }
+    @keyframes floaty{
+      0%{ transform: translateY(0); } 50%{ transform: translateY(-4px);} 100%{ transform: translateY(0); }
+    }
 
     /* Heart particles */
     .heart{
@@ -78,10 +115,9 @@
     @media (prefers-reduced-motion: reduce){
       .btn,.heart,.sparkle{ transition:none !important; animation:none !important; }
     }
-
     /* Mobile layout nudge */
     @media (max-width: 560px){
-      .buttons{ grid-template-columns: 1fr; gap: 12px; min-height: 260px; }
+      .buttons{ grid-template-columns: 1fr; gap: 12px; min-height: 290px; }
       .buttons .btn.floating, .decoy{ position: absolute; }
     }
   </style>
@@ -93,6 +129,12 @@
       <p class="sub">Tip: Open this on your phone for the full chaos. 😏</p>
       <p id="desktopHint" class="hint" hidden>Hint: You’re on desktop—mobile has extra mischief.</p>
     </header>
+
+    <!-- Countdown chip (shown during chaos on mobile) -->
+    <div id="decoyChip" class="chip" hidden>
+      <span class="dot" aria-hidden="true"></span>
+      <span>Decoys vanish in <strong id="chipTime">0:45</strong>…</span>
+    </div>
 
     <section class="buttons" id="buttonsArea">
       <button id="yesBtn" class="btn yes" aria-label="Yes">YES 💞</button>
@@ -106,12 +148,18 @@
     </footer>
   </main>
 
-  <!-- Success overlay -->
+  <!-- Success overlay (romantic) -->
   <div id="successOverlay" class="overlay" hidden>
     <div class="overlay-card">
       <h2>She said <span class="accent">YES</span>! 🎉</h2>
-      <p>Plot twist: You’ve always been the main character, DVK. 💘</p>
-      <button class="btn primary" id="replayBtn">Replay hearts</button>
+      <p style="margin: 12px 0 0; font-size: 18px; line-height: 1.55;">
+        <strong>DVK</strong>,<br>
+        Every ordinary day with you feels like something the universe wrote on purpose.<br>
+        Thank you for being the soft and steady in my world—the warm every morning, the calm in the noise.<br>
+        Today and always, I choose you—your smile, your laugh, your heart—and the peace I find in all of them.<br>
+        <em>Happy Valentine’s Day. Forever yours — KGT ❤️</em>
+      </p>
+      <button class="btn primary" id="replayBtn" style="margin-top:16px;">Replay hearts</button>
     </div>
   </div>
 
@@ -121,7 +169,7 @@
 
   <script>
     /* ==============================
-       Mobile-only Chaos + 45s Decoys + Extra Snark
+       Mobile-only Chaos + 45s Decoys + Countdown + Golden YES + Extra Snark
     ================================*/
 
     // ---- Capability / mobile gating ----
@@ -140,7 +188,7 @@
     const REQUIRED_TAUNTS     = 6;        // Taunts needed before real YES unlocks
 
     const DECOY_INTERVAL_MS   = 1000;     // continuous decoy spawns during chaos (mobile)
-    const DECOY_DURATION_MS   = 45000;    // ⏱️ total time decoys are allowed (spawn + exist)
+    const DECOY_DURATION_MS   = 45000;    // ⏱️ total time decoys are allowed
     const MAX_DECOYS          = 18;       // cap for performance
     const JITTER_MS           = 360;      // jiggle speed during chaos (mobile)
 
@@ -158,6 +206,8 @@
     const hearts   = document.getElementById('hearts');
     const sparkles = document.getElementById('sparkles');
     const replayBtn= document.getElementById('replayBtn');
+    const chip     = document.getElementById('decoyChip');
+    const chipTime = document.getElementById('chipTime');
 
     // State
     const startTime = performance.now();
@@ -165,8 +215,9 @@
     let tauntIndex = 0, tauntsShown = 0;
     let noScale = 1.0;
     let decoys = [];
-    let jitterTimer = null, decoyIntervalId = null, decoyEndTimeoutId = null;
+    let jitterTimer = null, decoyIntervalId = null, decoyEndTimeoutId = null, chipTimerId = null;
     let mischiefStart = null;
+    let goldenYesBtn = null;
 
     // Extra snarky one-liners
     const TAUNTS = [
@@ -182,19 +233,25 @@
       "Buffering romance… please stand adorably by. ⏳",
       "Terms of Service require at least one smile. ✅",
       "We detected excessive cuteness. Please proceed. 🥰",
-      "New patch notes: YES now requires 1 (one) blush. 🌹",
+      "Patch notes: YES now requires 1 (one) blush. 🌹",
       "Warning: Tapping faster won’t unlock Ultra YES. ⚠️",
       "Fun fact: Your laugh increases accuracy by 200%. 🎯",
       "Suspicious activity: Too confident. Adorable tho. 😌",
       "Tip: Whisper 'pretty please' to your screen. It helps. 🤫",
       "Today’s forecast: 100% chance of you saying YES. ☀️",
       "Plot twist: The decoys were your friends all along. 🫶",
+      "Loading sincerity… okay wow that’s a lot. 💗",
+      "New achievement: ‘Button Chaser’. +50 charm. 🏅",
+      "Hint: Smiling unlocks hidden dialogue options. 😉",
+      "Your taps are cute, but your yes will be cuter. 💞",
+      "All roads lead to YES. Some just go scenic. 🌸",
     ];
 
     // Utils
     const rand = (min, max) => Math.random() * (max - min) + min;
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
     const timeElapsedMs = () => performance.now() - startTime;
+    const pad2 = n => n < 10 ? "0" + n : "" + n;
 
     function sparkleBurst(x, y){
       const emojis = ["✨","💖","💫","💞","🌟","💘"];
@@ -219,6 +276,31 @@
     }
     const growthInterval = setInterval(updateNoGrowth, NO_TICK_MS);
     updateNoGrowth();
+
+    /* ---------- Countdown chip ---------- */
+    function startCountdownChip(){
+      if (!IS_MOBILE) return;
+      chip.hidden = false;
+      updateChipTime(); // immediate
+      if (chipTimerId) clearInterval(chipTimerId);
+      chipTimerId = setInterval(updateChipTime, 1000);
+    }
+    function stopCountdownChip(){
+      chip.hidden = true;
+      if (chipTimerId) clearInterval(chipTimerId);
+      chipTimerId = null;
+    }
+    function updateChipTime(){
+      if (!mischiefStart) return;
+      const msLeft = Math.max(0, DECOY_DURATION_MS - (performance.now() - mischiefStart));
+      const s = Math.ceil(msLeft/1000);
+      const m = Math.floor(s / 60);
+      const ss = pad2(s % 60);
+      chipTime.textContent = `${m}:${ss}`;
+      if (s === 0){
+        chipTime.textContent = "0:00";
+      }
+    }
 
     /* ---------- Chaos helpers (mobile only) ---------- */
     function showTaunt(custom){
@@ -275,7 +357,7 @@
     function stopDecoyInterval(){ if (decoyIntervalId){ clearInterval(decoyIntervalId); decoyIntervalId = null; } }
 
     function scheduleDecoyWindowEnd(){
-      // Hard stop after 45s: stop spawns and remove all decoys
+      // Hard stop after 45s: stop spawns, remove decoys, show golden YES
       if (decoyEndTimeoutId) clearTimeout(decoyEndTimeoutId);
       decoyEndTimeoutId = setTimeout(()=>{
         stopDecoyInterval();
@@ -283,6 +365,8 @@
         decoys.forEach(d=> d.remove());
         decoys = [];
         showTaunt("Okay, chaos cooldown engaged. The decoys have clocked out. 🕒");
+        stopCountdownChip();
+        spawnGoldenYes(); // 🌟 Dramatic single YES
       }, DECOY_DURATION_MS);
     }
 
@@ -312,6 +396,7 @@
       startJitter();
       startDecoyInterval();
       scheduleDecoyWindowEnd();
+      startCountdownChip();
 
       // Unlock flow after time+taunts
       const remainingFast = Math.max(0, YES_FAST_MS - timeElapsedMs());
@@ -350,7 +435,7 @@
       hookDecoy(d);
       decoys.push(d);
 
-      // Each decoy self-destructs when the window ends (or sooner if desired)
+      // Each decoy self-destructs when the window ends
       const ttl = timeLeftInDecoyWindow();
       setTimeout(()=> { if (d.isConnected) d.remove(); decoys = decoys.filter(x=>x!==d); }, ttl);
 
@@ -388,6 +473,34 @@
       });
     }
 
+    /* ---------- Golden YES Finale ---------- */
+    function spawnGoldenYes(){
+      // Make sure it only appears once, at the end of the decoy window
+      if (goldenYesBtn) return;
+      allowRealYes = true; // You earned it ✨
+
+      goldenYesBtn = document.createElement('button');
+      goldenYesBtn.id = 'goldenYes';
+      goldenYesBtn.className = 'btn yes golden-yes floating';
+      goldenYesBtn.textContent = 'YES ✨';
+      goldenYesBtn.setAttribute('aria-label','The real, golden YES');
+
+      buttons.appendChild(goldenYesBtn);
+
+      // Center it
+      const area = buttons.getBoundingClientRect();
+      goldenYesBtn.style.left = (area.width/2 - 70) + 'px';
+      goldenYesBtn.style.top  = (area.height/2 - 26) + 'px';
+
+      // Click -> real celebrate
+      goldenYesBtn.addEventListener('click', ()=>{
+        celebrate();
+        clearInterval(growthInterval);
+        tauntEl.textContent = "You. Me. Always. 💗";
+        yesBtn.disabled = true; noBtn.disabled = true;
+      });
+    }
+
     /* ---------- Hearts ---------- */
     function spawnHearts(count=60){
       const colors = ['#ff4d8d','#ff6fa3','#ff2e63','#ff9ac2','#ffb3cf'];
@@ -412,9 +525,10 @@
     /* ---------- Success ---------- */
     function celebrate(){
       overlay.hidden = false;
-      spawnHearts(100);
-      stopJitter(); stopDecoyInterval();
+      spawnHearts(110);
+      stopJitter(); stopDecoyInterval(); stopCountdownChip();
       if (decoyEndTimeoutId) { clearTimeout(decoyEndTimeoutId); decoyEndTimeoutId = null; }
+      if (goldenYesBtn) goldenYesBtn.classList.remove('floating');
     }
     replayBtn?.addEventListener('click', ()=> spawnHearts(80));
 
@@ -424,7 +538,7 @@
       if (!IS_MOBILE){
         celebrate();
         clearInterval(growthInterval);
-        tauntEl.textContent = "Best decision ever. 💗";
+        tauntEl.textContent = "You. Me. Always. 💗";
         yesBtn.disabled = true; noBtn.disabled = true;
         return;
       }
@@ -445,9 +559,10 @@
       // Real YES (mobile)
       celebrate();
       clearInterval(growthInterval);
-      tauntEl.textContent = "Best decision ever. 💗";
+      tauntEl.textContent = "You. Me. Always. 💗";
       yesBtn.disabled = true; noBtn.disabled = true;
       decoys.forEach(d=> d.remove()); decoys = [];
+      if (goldenYesBtn) goldenYesBtn.remove();
     });
 
     noBtn.addEventListener('click', ()=>{
