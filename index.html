@@ -1,195 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DVK 💕</title>
+<title>This Is Serious 😤❤️</title>
 
 <style>
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #ff9ecf, #ffc3e6, #ffe6f7);
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
+    margin: 0;
+    padding: 0;
+    font-family: 'Georgia', serif;
+    background: radial-gradient(circle at center, #ff4e50, #1c1c1c);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    color: white;
 }
 
-.card {
-  background: white;
-  padding: 30px;
-  border-radius: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  width: 90%;
-  max-width: 400px;
-  position: relative;
-  z-index: 10;
+.container {
+    max-width: 500px;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 30px;
 }
 
 button {
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 25px;
-  border: none;
-  cursor: pointer;
-  margin: 8px;
-  transition: 0.2s ease;
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 18px;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.yesBtn {
-  background: #ff4da6;
-  color: white;
-  position: absolute;
+#yesBtn {
+    background: #00ff88;
+    color: black;
+    font-weight: bold;
 }
 
 #noBtn {
-  background: #444;
-  color: white;
+    background: #444;
+    color: white;
+    position: absolute;
 }
 
-/* Floating hearts */
-.heart {
-  position: fixed;
-  bottom: -20px;
-  animation: floatUp 6s linear infinite;
-  opacity: 0.7;
+.message {
+    margin-top: 20px;
+    font-size: 18px;
+    min-height: 40px;
 }
 
-@keyframes floatUp {
-  0% { transform: translateY(0); opacity: 0.8; }
-  100% { transform: translateY(-110vh); opacity: 0; }
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: white;
+    top: 0;
+    animation: fall 3s linear forwards;
 }
 
-/* Popup messages */
-.popup {
-  position: fixed;
-  background: white;
-  padding: 10px 15px;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  font-size: 14px;
-  animation: fadeOut 4s forwards;
-  z-index: 999;
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-20px); }
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h1>DVK 💕</h1>
-  <h2>Will you be my Valentine? 💘</h2>
-  <p id="message">Try clicking Yes… if you can 😈</p>
-
-  <div id="buttonArea">
-    <button class="yesBtn">Yes 💖</button>
-    <button id="noBtn">No 😏</button>
-  </div>
+<div class="container">
+    <h1 id="question">Will You Be My Valentine? ❤️</h1>
+    <button id="yesBtn">Yes 😌</button>
+    <button id="noBtn">No 😐</button>
+    <div class="message" id="dramaText"></div>
 </div>
 
 <script>
-const buttonArea = document.getElementById("buttonArea");
 const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const dramaText = document.getElementById("dramaText");
+const question = document.getElementById("question");
 
-let scale = 1;
-let hoverTime = 0;
+let noCount = 0;
 
-/* Floating hearts */
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.classList.add("heart");
-  heart.innerHTML = "💖";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = (Math.random() * 20 + 15) + "px";
-  heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 6000);
-}
-setInterval(createHeart, 500);
-
-/* Popup messages */
 const dramaticLines = [
-  "Why are you hesitating? 😭",
-  "Commitment issues detected 🚨",
-  "The suspense is killing me 😩",
-  "My heart is buffering... ⏳",
-  "This is emotional cardio 🏃‍♂️💔",
-  "JUST CLICK IT 😈"
+    "Oh… okay. That hurt a little.",
+    "Are you sure? Like… emotionally sure?",
+    "I already told my mom you’d say yes.",
+    "My playlist is literally called 'Us Forever'.",
+    "This is getting awkward.",
+    "You’re clicking no like it pays you.",
+    "Do you enjoy chaos?",
+    "I will dramatically stare out of a window now.",
+    "Fine. I see how it is.",
+    "Last chance before I write poetry about this."
 ];
 
-function createPopup(text) {
-  const popup = document.createElement("div");
-  popup.classList.add("popup");
-  popup.innerText = text;
-  popup.style.left = Math.random() * 80 + "vw";
-  popup.style.top = Math.random() * 80 + "vh";
-  document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 4000);
-}
+// Move No button + escalate drama
+noBtn.addEventListener("mouseover", () => {
+    noCount++;
 
-/* YES behavior */
-function attachYesBehavior(btn) {
+    const x = Math.random() * (window.innerWidth - 100);
+    const y = Math.random() * (window.innerHeight - 50);
+    noBtn.style.left = `${x}px`;
+    noBtn.style.top = `${y}px`;
 
-  function dodge() {
-    const x = Math.random() * 250;
-    const y = Math.random() * 150;
-    btn.style.left = x + "px";
-    btn.style.top = y + "px";
-  }
-
-  // Desktop hover
-  btn.addEventListener("mouseover", dodge);
-
-  // Mobile touch
-  btn.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    dodge();
-  });
-
-  // Track hover duration
-  btn.addEventListener("mouseenter", () => {
-    hoverTime++;
-    if (hoverTime <= dramaticLines.length) {
-      createPopup(dramaticLines[hoverTime - 1]);
+    if (noCount <= dramaticLines.length) {
+        dramaText.textContent = dramaticLines[noCount - 1];
+    } else {
+        dramaText.textContent = "At this point the Yes button is your only option.";
     }
-  });
 
-  btn.addEventListener("click", () => {
-    document.querySelector(".card").innerHTML = `
-      <h1>🎉 YAY DVK!!! 🎉</h1>
-      <p>You defeated the chaos 💕</p>
-      <p>Maximum love mode unlocked 😌💖</p>
-    `;
-  });
-}
-
-attachYesBehavior(document.querySelector(".yesBtn"));
-
-/* NO button chaos */
-noBtn.addEventListener("click", () => {
-  scale += 0.3;
-
-  const newYes = document.createElement("button");
-  newYes.classList.add("yesBtn");
-  newYes.innerText = "Yes 💖";
-  newYes.style.left = Math.random() * 250 + "px";
-  newYes.style.top = Math.random() * 150 + "px";
-  newYes.style.transform = `scale(${scale})`;
-
-  attachYesBehavior(newYes);
-  buttonArea.appendChild(newYes);
-
-  document.querySelectorAll(".yesBtn").forEach(btn => {
-    btn.style.transform = `scale(${scale})`;
-  });
+    // Make YES button grow dramatically
+    let scale = 1 + (noCount * 0.15);
+    yesBtn.style.transform = `scale(${scale})`;
 });
+
+// YES clicked
+yesBtn.addEventListener("click", () => {
+    question.textContent = "I KNEW IT 😭❤️";
+    dramaText.textContent = "This is the best day of my entire existence.";
+    noBtn.style.display = "none";
+    yesBtn.style.display = "none";
+    launchConfetti();
+});
+
+// Confetti function
+function launchConfetti() {
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        document.body.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 5000);
+    }
+}
 </script>
 
 </body>
