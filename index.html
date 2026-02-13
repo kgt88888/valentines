@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DVK ❤️ Be Mine</title>
+<title>DVK… This Is Fate ❤️</title>
 
 <style>
 body {
     margin: 0;
     padding: 0;
-    font-family: Georgia, serif;
-    background: linear-gradient(180deg, #ff4e50, #1c1c1c);
+    font-family: 'Georgia', serif;
+    background: radial-gradient(circle at center, #ff003c, #000);
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -18,15 +18,21 @@ body {
     text-align: center;
     overflow: hidden;
     color: white;
+    transition: background 1s ease;
 }
 
 .container {
     width: 90%;
-    max-width: 400px;
+    max-width: 420px;
 }
 
 h1 {
-    font-size: 1.8rem;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+p {
+    opacity: 0.9;
 }
 
 .buttons {
@@ -37,9 +43,9 @@ h1 {
 }
 
 button {
-    padding: 15px;
+    padding: 16px;
     font-size: 18px;
-    border-radius: 40px;
+    border-radius: 50px;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -52,13 +58,26 @@ button {
 }
 
 #noBtn {
-    background: #444;
+    background: #333;
     color: white;
 }
 
 .message {
     margin-top: 20px;
-    min-height: 40px;
+    min-height: 50px;
+    font-style: italic;
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0% { transform: translate(2px, 2px); }
+    25% { transform: translate(-2px, -2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-2px, 2px); }
+    100% { transform: translate(0px, 0px); }
 }
 
 .confetti {
@@ -75,14 +94,29 @@ button {
         opacity: 0;
     }
 }
+
+#intro {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    z-index: 10;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>DVK ❤️</h1>
-    <p>Will you be my Valentine?</p>
+<div id="intro">
+    Preparing something important for DVK...
+</div>
+
+<div class="container" style="display:none;" id="mainContent">
+    <h1 id="title">DVK ❤️</h1>
+    <p id="subtitle">I have one very serious question for you...</p>
 
     <div class="buttons">
         <button id="yesBtn">Yes 😌</button>
@@ -93,38 +127,53 @@ button {
 </div>
 
 <script>
+const intro = document.getElementById("intro");
+const mainContent = document.getElementById("mainContent");
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const dramaText = document.getElementById("dramaText");
+const title = document.getElementById("title");
+const subtitle = document.getElementById("subtitle");
 
 let noCount = 0;
 
+setTimeout(() => {
+    intro.style.display = "none";
+    mainContent.style.display = "block";
+    subtitle.textContent = "Will you be my Valentine?";
+}, 2500);
+
 const dramaticLines = [
     "DVK… that hurt.",
-    "Are you sure?",
-    "I already told people we’re iconic.",
-    "This is getting dramatic.",
-    "You’re pressing no like it’s sponsored.",
-    "Do you enjoy chaos, DVK?",
-    "Last chance before I write poetry about this."
+    "Are you absolutely sure?",
+    "Think carefully. This is history.",
+    "I already imagined our wedding playlist.",
+    "You are pressing no with confidence.",
+    "This is becoming emotionally unsafe.",
+    "My heart just lagged.",
+    "Are you enjoying this chaos?",
+    "This feels personal.",
+    "Last chance before I start writing sad poetry."
 ];
 
 function moveNoButton() {
-    const x = Math.random() * 150 - 75;
-    const y = Math.random() * 150 - 75;
-
-    noBtn.style.transform = `translate(${x}px, ${y}px)`;
-
     noCount++;
+
+    const x = Math.random() * 200 - 100;
+    const y = Math.random() * 200 - 100;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
 
     if (noCount <= dramaticLines.length) {
         dramaText.textContent = dramaticLines[noCount - 1];
     } else {
-        dramaText.textContent = "DVK… the Yes button is your destiny.";
+        dramaText.textContent = "DVK… destiny is glowing green.";
     }
 
-    let scale = 1 + (noCount * 0.15);
+    let scale = 1 + (noCount * 0.18);
     yesBtn.style.transform = `scale(${scale})`;
+
+    document.body.classList.add("shake");
+    setTimeout(() => document.body.classList.remove("shake"), 300);
 }
 
 noBtn.addEventListener("mouseenter", moveNoButton);
@@ -134,14 +183,15 @@ noBtn.addEventListener("touchstart", function(e){
 });
 
 yesBtn.addEventListener("click", () => {
-    document.querySelector("h1").textContent = "I KNEW IT DVK 😭❤️";
-    dramaText.textContent = "Best decision ever.";
+    title.textContent = "I KNEW IT DVK 😭❤️";
+    subtitle.textContent = "This is the best decision of your entire existence.";
     document.querySelector(".buttons").style.display = "none";
+    document.body.style.background = "black";
     launchConfetti();
 });
 
 function launchConfetti() {
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 150; i++) {
         const confetti = document.createElement("div");
         confetti.classList.add("confetti");
         confetti.style.left = Math.random() * 100 + "vw";
