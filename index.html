@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Will you be my Valentine, DVK? 💘</title>
-  <meta name="description" content="Chaotic (mobile-only) Valentine with decoy YES buttons spawning every chaos, a growing NO, and lots of jokes." />
+  <meta name="description" content="Chaotic (mobile-only) Valentine with time-limited decoys, a growing NO, and extra snark." />
   <meta name="theme-color" content="#ff2e63" />
   <style>
     :root{
@@ -121,7 +121,7 @@
 
   <script>
     /* ==============================
-       Mobile-only Chaos + Decoys Every Chaos
+       Mobile-only Chaos + 45s Decoys + Extra Snark
     ================================*/
 
     // ---- Capability / mobile gating ----
@@ -135,13 +135,14 @@
     if (!IS_MOBILE) desktopHint.hidden = false;
 
     // ---- Config ----
-    const YES_FAST_MS       = 6000;    // YES before this -> fake on mobile
-    const MISCHIEF_MIN_MS   = 9000;    // Minimum chaos time
-    const REQUIRED_TAUNTS   = 6;       // Taunts needed before real YES unlocks
+    const YES_FAST_MS         = 6000;     // YES before this -> fake on mobile
+    const MISCHIEF_MIN_MS     = 9000;     // Minimum chaos time to "earn" real YES
+    const REQUIRED_TAUNTS     = 6;        // Taunts needed before real YES unlocks
 
-    const DECOY_INTERVAL_MS = 1100;    // 🔥 spawn decoys continuously during chaos (mobile only)
-    const MAX_DECOYS        = 18;      // Cap for performance
-    const JITTER_MS         = 380;     // Button jiggle speed during chaos (mobile only)
+    const DECOY_INTERVAL_MS   = 1000;     // continuous decoy spawns during chaos (mobile)
+    const DECOY_DURATION_MS   = 45000;    // ⏱️ total time decoys are allowed (spawn + exist)
+    const MAX_DECOYS          = 18;       // cap for performance
+    const JITTER_MS           = 360;      // jiggle speed during chaos (mobile)
 
     // NO growth parameters (exponential over time)
     const NO_GROWTH_BASE = 1.035;
@@ -164,9 +165,10 @@
     let tauntIndex = 0, tauntsShown = 0;
     let noScale = 1.0;
     let decoys = [];
-    let jitterTimer = null, decoyIntervalId = null;
+    let jitterTimer = null, decoyIntervalId = null, decoyEndTimeoutId = null;
+    let mischiefStart = null;
 
-    // One-liners
+    // Extra snarky one-liners
     const TAUNTS = [
       "Speedrun detected. Any% is banned in this category. 🏁",
       "You can’t cookie-popup YES your way into love. 🍪",
@@ -176,6 +178,17 @@
       "Patience increases charm by +10. ✨",
       "Almost there… grin a little more. 😁",
       "Nice try. That button has commitment issues. 😂",
+      "Error 404: Instant YES not found. Try vibes. 🔍",
+      "Buffering romance… please stand adorably by. ⏳",
+      "Terms of Service require at least one smile. ✅",
+      "We detected excessive cuteness. Please proceed. 🥰",
+      "New patch notes: YES now requires 1 (one) blush. 🌹",
+      "Warning: Tapping faster won’t unlock Ultra YES. ⚠️",
+      "Fun fact: Your laugh increases accuracy by 200%. 🎯",
+      "Suspicious activity: Too confident. Adorable tho. 😌",
+      "Tip: Whisper 'pretty please' to your screen. It helps. 🤫",
+      "Today’s forecast: 100% chance of you saying YES. ☀️",
+      "Plot twist: The decoys were your friends all along. 🫶",
     ];
 
     // Utils
@@ -213,8 +226,8 @@
       tauntsShown++;
       tauntEl.textContent = msg;
 
-      // Spawn a decoy on every taunt during chaos (mobile only)
-      if (IS_MOBILE && mischief) spawnDecoyNear(yesBtn, randomYesLabel());
+      // Spawn a decoy on every taunt during chaos (mobile only; within 45s window)
+      if (IS_MOBILE && mischief && decoyWindowActive()) spawnDecoyNear(yesBtn, randomYesLabel());
     }
 
     function scramble(el){
@@ -225,8 +238,9 @@
       el.style.left = (Math.random()*maxLeft) + 'px';
       el.style.top  = (Math.random()*maxTop) + 'px';
       el.style.transition = 'top .18s ease, left .18s ease, transform .12s ease';
-      // Spawn a decoy on every scramble during chaos (mobile only)
-      if (IS_MOBILE && mischief) spawnDecoyNear(el, randomYesLabel());
+
+      // Spawn a decoy on every scramble during chaos (mobile only; within 45s)
+      if (IS_MOBILE && mischief && decoyWindowActive()) spawnDecoyNear(el, randomYesLabel());
     }
 
     function jitter(){
@@ -240,18 +254,40 @@
     function startJitter(){ if (!IS_MOBILE) return; if (!jitterTimer) jitterTimer = setInterval(jitter, JITTER_MS); }
     function stopJitter(){ if (jitterTimer){ clearInterval(jitterTimer); jitterTimer = null; } }
 
+    /* ---------- Decoy lifecycle control (45s window) ---------- */
+    function decoyWindowActive(){
+      if (!mischiefStart) return false;
+      return (performance.now() - mischiefStart) < DECOY_DURATION_MS;
+    }
+    function timeLeftInDecoyWindow(){
+      if (!mischiefStart) return 0;
+      return Math.max(0, DECOY_DURATION_MS - (performance.now() - mischiefStart));
+    }
+
     function startDecoyInterval(){
       if (!IS_MOBILE) return;
       if (decoyIntervalId) return;
       decoyIntervalId = setInterval(()=>{
-        if (!mischief) return;
+        if (!mischief || !decoyWindowActive()) return;
         if (decoys.length < MAX_DECOYS) spawnDecoyNear(yesBtn, randomYesLabel());
       }, DECOY_INTERVAL_MS);
     }
     function stopDecoyInterval(){ if (decoyIntervalId){ clearInterval(decoyIntervalId); decoyIntervalId = null; } }
 
+    function scheduleDecoyWindowEnd(){
+      // Hard stop after 45s: stop spawns and remove all decoys
+      if (decoyEndTimeoutId) clearTimeout(decoyEndTimeoutId);
+      decoyEndTimeoutId = setTimeout(()=>{
+        stopDecoyInterval();
+        // remove existing decoys
+        decoys.forEach(d=> d.remove());
+        decoys = [];
+        showTaunt("Okay, chaos cooldown engaged. The decoys have clocked out. 🕒");
+      }, DECOY_DURATION_MS);
+    }
+
     function randomYesLabel(){
-      const labels = ["YES 💗","YES?! 💖","YEP 💓","SURE 💞","ABSOLUTELY 💘","YES* 💝"];
+      const labels = ["YES 💗","YES?! 💖","YEP 💓","SURE 💞","ABSOLUTELY 💘","YES* 💝","PROBABLY 💟","HECK YES 💜"];
       return labels[Math.floor(Math.random()*labels.length)];
     }
 
@@ -260,6 +296,7 @@
       if (mischief) return;
       mischief = true;
       tauntsShown = 0;
+      mischiefStart = performance.now();
 
       yesBtn.classList.add('floating'); noBtn.classList.add('floating');
       scramble(yesBtn); scramble(noBtn);
@@ -270,10 +307,11 @@
         noBtn.addEventListener(evt, ()=>{ scramble(noBtn); }, {passive:true});
       });
 
-      // Initial decoy burst & continuous spawning
+      // Initial decoy burst & continuous spawning (within window)
       spawnDecoyNear(yesBtn, "YES 💖 (trust me)");
       startJitter();
       startDecoyInterval();
+      scheduleDecoyWindowEnd();
 
       // Unlock flow after time+taunts
       const remainingFast = Math.max(0, YES_FAST_MS - timeElapsedMs());
@@ -300,7 +338,9 @@
     /* ---------- Decoys ---------- */
     function spawnDecoyNear(anchorEl, label="YES 💖"){
       if (!IS_MOBILE) return;
+      if (!decoyWindowActive()) return; // Only inside the 45s window
       if (decoys.length >= MAX_DECOYS) return;
+
       const d = document.createElement('button');
       d.className = 'btn yes decoy';
       d.textContent = label;
@@ -309,14 +349,19 @@
       positionDecoy(anchorEl, d);
       hookDecoy(d);
       decoys.push(d);
+
+      // Each decoy self-destructs when the window ends (or sooner if desired)
+      const ttl = timeLeftInDecoyWindow();
+      setTimeout(()=> { if (d.isConnected) d.remove(); decoys = decoys.filter(x=>x!==d); }, ttl);
+
       return d;
     }
 
     function positionDecoy(anchorEl, d){
       const a = anchorEl.getBoundingClientRect();
       const area = buttons.getBoundingClientRect();
-      const left = clamp(a.left - area.left + rand(-90, 90), 0, area.width - (a.width*0.9));
-      const top  = clamp(a.top  - area.top  + rand(-60, 80), 0, area.height - (a.height*0.9));
+      const left = clamp(a.left - area.left + rand(-90, 90), 0, area.width - Math.max(100, a.width*0.9));
+      const top  = clamp(a.top  - area.top  + rand(-60, 80), 0, area.height - Math.max(60, a.height*0.9));
       d.style.left = left + 'px';
       d.style.top  = top  + 'px';
     }
@@ -326,8 +371,8 @@
         d.addEventListener(evt, (e)=>{
           e.preventDefault(); e.stopPropagation();
           scramble(d);
-          // Spawn a friend (cascade) on interaction if below cap
-          if (decoys.length < MAX_DECOYS && Math.random() > 0.35){
+          // Spawn a friend (cascade) on interaction if below cap and within window
+          if (decoyWindowActive() && decoys.length < MAX_DECOYS && Math.random() > 0.35){
             spawnDecoyNear(d, randomYesLabel());
           }
         }, {passive:true});
@@ -369,6 +414,7 @@
       overlay.hidden = false;
       spawnHearts(100);
       stopJitter(); stopDecoyInterval();
+      if (decoyEndTimeoutId) { clearTimeout(decoyEndTimeoutId); decoyEndTimeoutId = null; }
     }
     replayBtn?.addEventListener('click', ()=> spawnHearts(80));
 
@@ -405,7 +451,7 @@
     });
 
     noBtn.addEventListener('click', ()=>{
-      showTaunt("Bold choice. Respectfully incorrect. Try again. 😌");
+      tauntEl.textContent = "Bold choice. Respectfully incorrect. Try again. 😌";
       noScale = Math.min(NO_MAX_SCALE, noScale * 1.08);
       noBtn.style.transform = `scale(${noScale}) rotate(${(noScale-1)*6}deg)`;
       if (IS_MOBILE && mischief) scramble(noBtn);
