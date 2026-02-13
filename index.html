@@ -1,189 +1,88 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Will you be my Valentine, DVK? 💘</title>
-  <meta name="description" content="A playful Valentine's Day page with a tricky YES and a growing NO." />
+  <meta name="description" content="Chaotic (mobile-only) Valentine with decoy YES buttons spawning every chaos, a growing NO, and lots of jokes." />
   <meta name="theme-color" content="#ff2e63" />
   <style>
-    /* ==============================
-       Valentine’s Styles 💖
-    ===============================*/
     :root{
-      --bg1:#ffdee9;
-      --bg2:#b5fffc;
-      --pink:#ff4d8d;
-      --rose:#ff6fa3;
-      --red:#ff2e63;
-      --dark:#2c2c35;
-      --white:#fff;
-      --shadow: 0 20px 40px rgba(0,0,0,.12);
-      --shadow-soft: 0 10px 25px rgba(0,0,0,.10);
+      --bg1:#ffdee9; --bg2:#b5fffc; --pink:#ff4d8d; --rose:#ff6fa3; --red:#ff2e63;
+      --dark:#2c2c35; --white:#fff; --shadow:0 20px 40px rgba(0,0,0,.12); --shadow-soft:0 10px 25px rgba(0,0,0,.10);
     }
-
     *{ box-sizing:border-box; }
-
     html,body{
-      height:100%;
-      margin:0;
+      height:100%; margin:0;
       font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
       color: var(--dark);
-      background: radial-gradient(1200px 600px at 20% 0%,#fff0f6,transparent 70%),
-                  radial-gradient(800px 500px at 90% 20%,#e6fffb,transparent 60%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      background:
+        radial-gradient(1200px 600px at 20% 0%,#fff0f6,transparent 70%),
+        radial-gradient(800px 500px at 90% 20%,#e6fffb,transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-width: 320px;
     }
-
     main.card{
-      max-width: 760px;
-      margin: 5vh auto;
-      background: var(--white);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      padding: clamp(18px, 3.5vw, 36px);
-      position: relative;
+      max-width: 840px; margin: 5vh auto; background: var(--white); border-radius: 20px;
+      box-shadow: var(--shadow); padding: clamp(18px, 3.5vw, 36px); position: relative; overflow: hidden; isolation: isolate;
     }
-
-    h1{
-      font-size: clamp(28px, 4.6vw, 48px);
-      line-height: 1.15;
-      margin: 0 0 6px 0;
-    }
-
-    .sub{
-      margin: 0 0 24px 0;
-      opacity: .8;
-      font-size: clamp(14px, 2.5vw, 18px);
-    }
-
+    h1{ font-size: clamp(28px, 4.6vw, 48px); line-height: 1.15; margin: 0 0 6px; }
+    .sub{ margin: 0 0 24px; opacity: .85; font-size: clamp(14px,2.5vw,18px); }
     .accent{ color: var(--red); font-weight: 800; }
-
+    .hint{ font-size: 13px; opacity: .75; margin: 0 0 8px; }
     .buttons{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      min-height: 140px;
-      padding: 8px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+      align-items: center; justify-content: center; position: relative;
+      min-height: 190px; padding: 10px; overflow: visible;
     }
-
     .btn{
-      cursor: pointer;
-      font-size: clamp(18px, 3.5vw, 22px);
-      padding: 14px 22px;
-      border-radius: 14px;
-      border: none;
+      cursor: pointer; font-size: clamp(18px,3.5vw,22px);
+      padding: 16px 24px; border-radius: 14px; border: none;
       box-shadow: var(--shadow-soft);
-      transition: transform .15s ease, box-shadow .15s ease, background .2s ease, color .2s ease;
-      background: #fff;
-      user-select: none;
+      background: #fff; user-select: none; position: relative; z-index: 2;
+      transition: transform .15s ease, box-shadow .15s ease, top .18s ease, left .18s ease;
     }
-
     .btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 24px rgba(0,0,0,.12); }
-
-    .btn:disabled{
-      opacity: .6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .btn.yes{
-      background: linear-gradient(135deg, #fff, #ffe8f1);
-      border: 2px solid #ffd0e0;
-      color: var(--red);
-      font-weight: 800;
-    }
-
-    .btn.no{
-      background: #ffffff;
-      border: 2px dashed #ffb9d1;
-      color: #6f6f7a;
-      font-weight: 700;
-    }
-
-    .btn.primary{
-      background: var(--red);
-      color: #fff;
-    }
-
-    .taunt{
-      min-height: 28px;
-      margin: 14px 2px 6px;
-      font-size: clamp(14px, 2.4vw, 18px);
-      color: #7a7a86;
-    }
-
-    .tiny{
-      margin-top: 18px;
-      font-size: 12px;
-      opacity: .65;
-    }
-
+    .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none !important; box-shadow: var(--shadow-soft); }
+    .btn.yes{ background: linear-gradient(135deg, #fff, #ffe8f1); border: 2px solid #ffd0e0; color: var(--red); font-weight: 800; }
+    .btn.no{ background: #fff; border: 2px dashed #ffb9d1; color: #6f6f7a; font-weight: 700; }
+    .btn.primary{ background: var(--red); color: #fff; }
+    .taunt{ min-height: 32px; margin: 16px 2px 8px; font-size: clamp(14px,2.4vw,18px); color: #7a7a86; }
+    .tiny{ margin-top: 18px; font-size: 12px; opacity: .65; }
     .overlay{
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(255, 240, 246, .88);
-      z-index: 50;
+      position: fixed; inset: 0; display: grid; place-items: center;
+      background: rgba(255,240,246,.88); z-index: 50; backdrop-filter: blur(3px);
     }
-    .overlay[hidden]{ display: none; }
+    .overlay[hidden]{ display:none; }
+    .overlay-card{ background:#fff; border-radius:18px; padding:24px; max-width:560px; text-align:center; box-shadow: var(--shadow); }
 
-    .overlay-card{
-      background: #fff;
-      border-radius: 18px;
-      padding: 24px;
-      max-width: 560px;
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
+    #hearts, #sparkles{ position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 40; }
 
-    #hearts{
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 40;
-    }
+    /* Chaos floating mode */
+    .buttons .btn.floating, .decoy{ position: absolute !important; will-change: transform, top, left; z-index: 3; }
 
-    .buttons .btn.floating{
-      position: absolute;
-      will-change: transform, top, left;
-    }
-
+    /* Heart particles */
     .heart{
-      position: absolute;
-      width: 14px; height: 14px;
-      transform: rotate(45deg);
-      background: var(--pink);
-      box-shadow: 0 6px 16px rgba(255,0,85,.25);
-      animation: floatUp linear forwards;
+      position: absolute; width: 14px; height: 14px; transform: rotate(45deg); background: var(--pink);
+      box-shadow: 0 6px 16px rgba(255,0,85,.25); animation: floatUp linear forwards;
+    }
+    .heart::before, .heart::after{ content:""; position:absolute; width:14px; height:14px; border-radius:50%; background:inherit; top:-7px; left:0; }
+    .heart::after{ left:-7px; top:0; }
+    @keyframes floatUp{ 0%{opacity:0; transform: translateY(0) rotate(45deg) scale(.6);}10%{opacity:1;}100%{opacity:0; transform: translateY(-110vh) rotate(45deg) scale(1.2);} }
+
+    /* Sparkles */
+    .sparkle{ position:absolute; font-size:16px; animation: popUp .9s ease-out forwards; filter: drop-shadow(0 6px 12px rgba(255,0,128,.25)); }
+    @keyframes popUp{ 0%{ transform: translateY(0) scale(.6) rotate(0deg); opacity:0; } 35%{opacity:1;} 100%{ transform: translateY(-80px) scale(1.2) rotate(10deg); opacity:0;} }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .btn,.heart,.sparkle{ transition:none !important; animation:none !important; }
     }
 
-    .heart::before,
-    .heart::after{
-      content: "";
-      position: absolute;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: inherit;
-      top: -7px; left: 0;
-    }
-    .heart::after{ left: -7px; top: 0; }
-
-    @keyframes floatUp{
-      0% { opacity: 0; transform: translateY(0) rotate(45deg) scale(.6); }
-      10%{ opacity: 1; }
-      100%{ opacity: 0; transform: translateY(-110vh) rotate(45deg) scale(1.2); }
-    }
-
-    @media (max-width: 520px){
-      .buttons{ grid-template-columns: 1fr; gap: 10px; min-height: 180px; }
-      .buttons .btn.floating{ position: absolute; }
+    /* Mobile layout nudge */
+    @media (max-width: 560px){
+      .buttons{ grid-template-columns: 1fr; gap: 12px; min-height: 260px; }
+      .buttons .btn.floating, .decoy{ position: absolute; }
     }
   </style>
 </head>
@@ -191,179 +90,334 @@
   <main class="card" id="stage">
     <header>
       <h1>Will you be my Valentine, <span class="accent">DVK</span>? 💝</h1>
-      <p class="sub">Answer honestly… but no speedruns 😏</p>
+      <p class="sub">Tip: Open this on your phone for the full chaos. 😏</p>
+      <p id="desktopHint" class="hint" hidden>Hint: You’re on desktop—mobile has extra mischief.</p>
     </header>
 
     <section class="buttons" id="buttonsArea">
-      <button id="yesBtn" class="btn yes">YES 💞</button>
-      <button id="noBtn" class="btn no">NO 🙃</button>
+      <button id="yesBtn" class="btn yes" aria-label="Yes">YES 💞</button>
+      <button id="noBtn" class="btn no" aria-label="No">NO 🙃</button>
     </section>
 
-    <p id="taunt" class="taunt"></p>
+    <p id="taunt" class="taunt" aria-live="polite" role="status"></p>
 
     <footer class="tiny">
-      Made with 💗 by <span class="accent">Kyavand</span>
+      Made with 💗 by <span class="accent">KGT</span>
     </footer>
   </main>
 
+  <!-- Success overlay -->
   <div id="successOverlay" class="overlay" hidden>
     <div class="overlay-card">
       <h2>She said <span class="accent">YES</span>! 🎉</h2>
-      <p>You’re my favorite notification. Always have been. 💘</p>
+      <p>Plot twist: You’ve always been the main character, DVK. 💘</p>
       <button class="btn primary" id="replayBtn">Replay hearts</button>
     </div>
   </div>
 
+  <!-- Party layers -->
   <div id="hearts"></div>
+  <div id="sparkles"></div>
 
   <script>
     /* ==============================
-       Valentine’s Mischief Logic
+       Mobile-only Chaos + Decoys Every Chaos
     ================================*/
 
-    const YES_FAST_MS = 5000;
-    const MISCHIEF_MIN_MS = 8000;
-    const REQUIRED_TAUNTS = 5;
+    // ---- Capability / mobile gating ----
+    const MOBILE_WIDTH_MAX = 600;
+    const IS_MOBILE = (window.matchMedia && matchMedia(`(max-width:${MOBILE_WIDTH_MAX}px)`).matches)
+                      || ('ontouchstart' in window)
+                      || (navigator.maxTouchPoints > 0);
 
-    const NO_GROWTH_BASE = 1.03;
-    const NO_MAX_SCALE = 3.5;
-    const NO_TICK_MS = 180;
+    // Show hint if not mobile
+    const desktopHint = document.getElementById('desktopHint');
+    if (!IS_MOBILE) desktopHint.hidden = false;
 
-    const yesBtn = document.getElementById('yesBtn');
-    const noBtn = document.getElementById('noBtn');
-    const tauntEl = document.getElementById('taunt');
-    const buttonsArea = document.getElementById('buttonsArea');
-    const overlay = document.getElementById('successOverlay');
-    const heartsLayer = document.getElementById('hearts');
-    const replayBtn = document.getElementById('replayBtn');
+    // ---- Config ----
+    const YES_FAST_MS       = 6000;    // YES before this -> fake on mobile
+    const MISCHIEF_MIN_MS   = 9000;    // Minimum chaos time
+    const REQUIRED_TAUNTS   = 6;       // Taunts needed before real YES unlocks
 
+    const DECOY_INTERVAL_MS = 1100;    // 🔥 spawn decoys continuously during chaos (mobile only)
+    const MAX_DECOYS        = 18;      // Cap for performance
+    const JITTER_MS         = 380;     // Button jiggle speed during chaos (mobile only)
+
+    // NO growth parameters (exponential over time)
+    const NO_GROWTH_BASE = 1.035;
+    const NO_MAX_SCALE   = 4.2;
+    const NO_TICK_MS     = 160;
+
+    // Elements
+    const yesBtn   = document.getElementById('yesBtn');
+    const noBtn    = document.getElementById('noBtn');
+    const tauntEl  = document.getElementById('taunt');
+    const buttons  = document.getElementById('buttonsArea');
+    const overlay  = document.getElementById('successOverlay');
+    const hearts   = document.getElementById('hearts');
+    const sparkles = document.getElementById('sparkles');
+    const replayBtn= document.getElementById('replayBtn');
+
+    // State
     const startTime = performance.now();
-    let mischief = false;
-    let allowRealYes = false;
-    let tauntIndex = 0;
-    let tauntsShown = 0;
+    let mischief = false, allowRealYes = false;
+    let tauntIndex = 0, tauntsShown = 0;
     let noScale = 1.0;
+    let decoys = [];
+    let jitterTimer = null, decoyIntervalId = null;
 
+    // One-liners
     const TAUNTS = [
-      "Whoa, that was fast! Did you even read the terms & conditions? 😏",
-      "Speedrun any% detected. Not today—Cupid says no skips. 🏃‍♀️💨",
-      "Patience, my love—romance is a slow-cooked stew. 🍲💘",
-      "You can’t just mash YES like it’s a cookie pop-up. 🍪",
-      "Catch the button if you can. It’s shy but flattered. 😉",
-      "Okay okay, I like your enthusiasm… try again (for real). 💗",
-      "Almost there! The real YES appears when your heart says ‘duh’. ❤️",
+      "Speedrun detected. Any% is banned in this category. 🏁",
+      "You can’t cookie-popup YES your way into love. 🍪",
+      "The YES is shy. Compliment it first. 😉",
+      "Close! That was the demo. Insert coin. 🪙",
+      "Captcha: Select all squares with TRUE LOVE. ❤️",
+      "Patience increases charm by +10. ✨",
+      "Almost there… grin a little more. 😁",
+      "Nice try. That button has commitment issues. 😂",
     ];
 
-    function timeElapsedMs(){ return performance.now() - startTime; }
+    // Utils
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const timeElapsedMs = () => performance.now() - startTime;
 
+    function sparkleBurst(x, y){
+      const emojis = ["✨","💖","💫","💞","🌟","💘"];
+      const count = 10;
+      for (let i=0;i<count;i++){
+        const s = document.createElement('div');
+        s.className = 'sparkle';
+        s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        s.style.left = (x + rand(-18, 18)) + 'px';
+        s.style.top  = (y + rand(-12, 12)) + 'px';
+        s.style.fontSize = (14 + Math.random()*12) + 'px';
+        sparkles.appendChild(s);
+        setTimeout(()=> s.remove(), 1000);
+      }
+    }
+
+    /* ---------- NO: exponential growth ---------- */
     function updateNoGrowth(){
       const seconds = timeElapsedMs() / 1000;
       noScale = Math.min(NO_MAX_SCALE, Math.pow(NO_GROWTH_BASE, seconds));
-      noBtn.style.transform = `scale(${noScale})`;
+      noBtn.style.transform = `scale(${noScale}) rotate(${(noScale-1)*4}deg)`;
     }
     const growthInterval = setInterval(updateNoGrowth, NO_TICK_MS);
     updateNoGrowth();
 
-    function showTaunt(){
-      const msg = TAUNTS[tauntIndex % TAUNTS.length];
-      tauntIndex++;
+    /* ---------- Chaos helpers (mobile only) ---------- */
+    function showTaunt(custom){
+      const msg = custom || TAUNTS[tauntIndex++ % TAUNTS.length];
       tauntsShown++;
       tauntEl.textContent = msg;
+
+      // Spawn a decoy on every taunt during chaos (mobile only)
+      if (IS_MOBILE && mischief) spawnDecoyNear(yesBtn, randomYesLabel());
     }
 
-    function scrambleButtons(){
-      const area = buttonsArea.getBoundingClientRect();
-      [yesBtn, noBtn].forEach(btn=>{
-        const b = btn.getBoundingClientRect();
-        const maxLeft = area.width - b.width;
-        const maxTop = area.height - b.height;
-        btn.style.left = (Math.random()*maxLeft)+"px";
-        btn.style.top = (Math.random()*maxTop)+"px";
-        btn.style.transition = "top .22s ease, left .22s ease";
+    function scramble(el){
+      const area = buttons.getBoundingClientRect();
+      const b = el.getBoundingClientRect();
+      const maxLeft = Math.max(0, area.width - b.width);
+      const maxTop  = Math.max(0, area.height - b.height);
+      el.style.left = (Math.random()*maxLeft) + 'px';
+      el.style.top  = (Math.random()*maxTop) + 'px';
+      el.style.transition = 'top .18s ease, left .18s ease, transform .12s ease';
+      // Spawn a decoy on every scramble during chaos (mobile only)
+      if (IS_MOBILE && mischief) spawnDecoyNear(el, randomYesLabel());
+    }
+
+    function jitter(){
+      if (!mischief) return;
+      [...decoys, yesBtn, noBtn].forEach(el=>{
+        if (!el.classList.contains('floating') && !el.classList.contains('decoy')) return;
+        const dx = rand(-6,6), dy = rand(-4,8), rot = rand(-2,2);
+        el.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
       });
+    }
+    function startJitter(){ if (!IS_MOBILE) return; if (!jitterTimer) jitterTimer = setInterval(jitter, JITTER_MS); }
+    function stopJitter(){ if (jitterTimer){ clearInterval(jitterTimer); jitterTimer = null; } }
+
+    function startDecoyInterval(){
+      if (!IS_MOBILE) return;
+      if (decoyIntervalId) return;
+      decoyIntervalId = setInterval(()=>{
+        if (!mischief) return;
+        if (decoys.length < MAX_DECOYS) spawnDecoyNear(yesBtn, randomYesLabel());
+      }, DECOY_INTERVAL_MS);
+    }
+    function stopDecoyInterval(){ if (decoyIntervalId){ clearInterval(decoyIntervalId); decoyIntervalId = null; } }
+
+    function randomYesLabel(){
+      const labels = ["YES 💗","YES?! 💖","YEP 💓","SURE 💞","ABSOLUTELY 💘","YES* 💝"];
+      return labels[Math.floor(Math.random()*labels.length)];
     }
 
     function startMischief(){
+      if (!IS_MOBILE) return; // 🔒 Chaos is mobile-only
       if (mischief) return;
       mischief = true;
+      tauntsShown = 0;
 
-      yesBtn.classList.add("floating");
-      noBtn.classList.add("floating");
+      yesBtn.classList.add('floating'); noBtn.classList.add('floating');
+      scramble(yesBtn); scramble(noBtn);
 
-      ["mouseenter","touchstart"].forEach(evt=>{
-        yesBtn.addEventListener(evt, scrambleButtons, {passive:true});
-        noBtn.addEventListener(evt, scrambleButtons, {passive:true});
+      // Evasive behavior (mobile events)
+      ['touchstart','pointerdown','mouseenter'].forEach(evt=>{
+        yesBtn.addEventListener(evt, (e)=>{ if (!allowRealYes){ scramble(yesBtn); const t=e.touches?.[0]; sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0); showTaunt(); } }, {passive:true});
+        noBtn.addEventListener(evt, ()=>{ scramble(noBtn); }, {passive:true});
       });
 
-      scrambleButtons();
+      // Initial decoy burst & continuous spawning
+      spawnDecoyNear(yesBtn, "YES 💖 (trust me)");
+      startJitter();
+      startDecoyInterval();
 
+      // Unlock flow after time+taunts
       const remainingFast = Math.max(0, YES_FAST_MS - timeElapsedMs());
       const minChaos = Math.max(MISCHIEF_MIN_MS, remainingFast);
-
-      setTimeout(()=> maybeUnlockRealYes(), minChaos);
+      setTimeout(maybeUnlockRealYes, minChaos);
     }
 
     function maybeUnlockRealYes(){
+      if (!IS_MOBILE){ allowRealYes = true; return; }
       if (tauntsShown >= REQUIRED_TAUNTS){
         allowRealYes = true;
-        tauntEl.textContent = "Alright, alright—you’ve earned a real YES now. 💞";
+        tauntEl.textContent = "Cupid has verified your vibes. Real YES unlocked! 💘";
       } else {
-        const check = setInterval(()=>{
+        const chk = setInterval(()=>{
           if (tauntsShown >= REQUIRED_TAUNTS){
-            clearInterval(check);
+            clearInterval(chk);
             allowRealYes = true;
-            tauntEl.textContent = "Okay, Cupid approves. Real YES unlocked! 💘";
+            tauntEl.textContent = "Okay—you earned it. The REAL YES awaits. 💞";
           }
-        }, 1000);
+        }, 700);
       }
     }
 
+    /* ---------- Decoys ---------- */
+    function spawnDecoyNear(anchorEl, label="YES 💖"){
+      if (!IS_MOBILE) return;
+      if (decoys.length >= MAX_DECOYS) return;
+      const d = document.createElement('button');
+      d.className = 'btn yes decoy';
+      d.textContent = label;
+      d.setAttribute('aria-label','Definitely a real YES (not a trap)');
+      buttons.appendChild(d);
+      positionDecoy(anchorEl, d);
+      hookDecoy(d);
+      decoys.push(d);
+      return d;
+    }
+
+    function positionDecoy(anchorEl, d){
+      const a = anchorEl.getBoundingClientRect();
+      const area = buttons.getBoundingClientRect();
+      const left = clamp(a.left - area.left + rand(-90, 90), 0, area.width - (a.width*0.9));
+      const top  = clamp(a.top  - area.top  + rand(-60, 80), 0, area.height - (a.height*0.9));
+      d.style.left = left + 'px';
+      d.style.top  = top  + 'px';
+    }
+
+    function hookDecoy(d){
+      ['touchstart','pointerdown','mouseenter'].forEach(evt=>{
+        d.addEventListener(evt, (e)=>{
+          e.preventDefault(); e.stopPropagation();
+          scramble(d);
+          // Spawn a friend (cascade) on interaction if below cap
+          if (decoys.length < MAX_DECOYS && Math.random() > 0.35){
+            spawnDecoyNear(d, randomYesLabel());
+          }
+        }, {passive:true});
+      });
+
+      d.addEventListener('click', (e)=>{
+        // Fake click -> taunt + sparkle
+        e.preventDefault();
+        const t = e.touches?.[0];
+        sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0);
+        showTaunt("Decoy detected. You’ve been adorably bamboozled. 😜");
+        scramble(d);
+      });
+    }
+
+    /* ---------- Hearts ---------- */
     function spawnHearts(count=60){
-      const colors = ["#ff4d8d","#ff6fa3","#ff2e63","#ff9ac2","#ffb3cf"];
-      const w = window.innerWidth;
+      const colors = ['#ff4d8d','#ff6fa3','#ff2e63','#ff9ac2','#ffb3cf'];
+      const width = window.innerWidth;
       for (let i=0;i<count;i++){
-        const h = document.createElement("div");
-        h.className = "heart";
+        const h = document.createElement('div');
+        h.className = 'heart';
         const size = 10 + Math.random()*16;
-        h.style.width = h.style.height = size+"px";
-        h.style.left = Math.random()*(w-20)+"px";
-        h.style.bottom = "-30px";
+        const duration = 5 + Math.random()*3;
+        const delay = Math.random()*0.6;
+        const x = Math.random()*(width-20);
+        h.style.left = `${x}px`; h.style.bottom = `-30px`;
+        h.style.width = `${size}px`; h.style.height = `${size}px`;
         h.style.background = colors[i % colors.length];
-        h.style.animationDuration = (5+Math.random()*3)+"s";
-        h.style.animationDelay = (Math.random()*0.6)+"s";
-        heartsLayer.appendChild(h);
-        setTimeout(()=>h.remove(), 8000);
+        h.style.animationDuration = `${duration}s`;
+        h.style.animationDelay = `${delay}s`;
+        hearts.appendChild(h);
+        setTimeout(()=> h.remove(), (duration+1.2)*1000);
       }
     }
 
+    /* ---------- Success ---------- */
     function celebrate(){
       overlay.hidden = false;
-      spawnHearts(90);
+      spawnHearts(100);
+      stopJitter(); stopDecoyInterval();
     }
+    replayBtn?.addEventListener('click', ()=> spawnHearts(80));
 
-    replayBtn.addEventListener("click", ()=> spawnHearts(70));
+    /* ---------- Click Logic ---------- */
+    yesBtn.addEventListener('click', (e)=>{
+      // Desktop: simple accept (no chaos)
+      if (!IS_MOBILE){
+        celebrate();
+        clearInterval(growthInterval);
+        tauntEl.textContent = "Best decision ever. 💗";
+        yesBtn.disabled = true; noBtn.disabled = true;
+        return;
+      }
 
-    yesBtn.addEventListener("click", ()=>{
+      // Mobile: gate real YES behind chaos
+      const elapsed = timeElapsedMs();
       if (!allowRealYes){
-        if (timeElapsedMs() < YES_FAST_MS || mischief){
-          showTaunt();
+        if (elapsed < YES_FAST_MS || mischief){
+          showTaunt("Too quick, speedster. That was a tutorial YES. 😏");
           startMischief();
-          scrambleButtons();
+          scramble(yesBtn);
+          const t = e.touches?.[0];
+          sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0);
           return;
         }
       }
+
+      // Real YES (mobile)
       celebrate();
       clearInterval(growthInterval);
       tauntEl.textContent = "Best decision ever. 💗";
-      yesBtn.disabled = true;
-      noBtn.disabled = true;
+      yesBtn.disabled = true; noBtn.disabled = true;
+      decoys.forEach(d=> d.remove()); decoys = [];
     });
 
-    noBtn.addEventListener("click", ()=>{
-      showTaunt();
-      noScale = Math.min(NO_MAX_SCALE, noScale * 1.05);
-      noBtn.style.transform = `scale(${noScale})`;
+    noBtn.addEventListener('click', ()=>{
+      showTaunt("Bold choice. Respectfully incorrect. Try again. 😌");
+      noScale = Math.min(NO_MAX_SCALE, noScale * 1.08);
+      noBtn.style.transform = `scale(${noScale}) rotate(${(noScale-1)*6}deg)`;
+      if (IS_MOBILE && mischief) scramble(noBtn);
     });
+
+    // Trigger chaos if they poke the YES (mobile) even before clicking
+    ['touchstart','pointerdown'].forEach(evt=>{
+      yesBtn.addEventListener(evt, ()=>{ if (IS_MOBILE) startMischief(); }, {passive:true});
+    });
+
+    // Tiny teaser sparkle
+    setTimeout(()=> sparkleBurst(innerWidth*0.6, innerHeight*0.3), 600);
   </script>
 </body>
 </html>
