@@ -3,81 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DVK… This Is Fate ❤️</title>
+<title>DVK… This Is Getting Out Of Control ❤️</title>
 
 <style>
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Georgia', serif;
-    background: radial-gradient(circle at center, #ff003c, #000);
+    font-family: Arial, sans-serif;
+    background: black;
     height: 100vh;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    overflow: hidden;
     color: white;
-    transition: background 1s ease;
+    transition: background 0.3s;
 }
 
 .container {
-    width: 90%;
-    max-width: 420px;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-p {
-    opacity: 0.9;
-}
-
-.buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 25px;
+    margin-top: 60px;
 }
 
 button {
-    padding: 16px;
-    font-size: 18px;
-    border-radius: 50px;
+    position: absolute;
+    padding: 12px 20px;
+    border-radius: 40px;
     border: none;
+    font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.2s;
 }
 
-#yesBtn {
-    background: #00ff88;
+.yes {
+    background: lime;
     color: black;
     font-weight: bold;
 }
 
-#noBtn {
-    background: #333;
+.no {
+    background: crimson;
     color: white;
 }
 
-.message {
-    margin-top: 20px;
-    min-height: 50px;
-    font-style: italic;
-}
-
-.shake {
-    animation: shake 0.3s;
+.glitch {
+    animation: shake 0.2s infinite;
 }
 
 @keyframes shake {
-    0% { transform: translate(2px, 2px); }
-    25% { transform: translate(-2px, -2px); }
-    50% { transform: translate(2px, -2px); }
-    75% { transform: translate(-2px, 2px); }
-    100% { transform: translate(0px, 0px); }
+    0% { transform: translate(3px, 3px); }
+    50% { transform: translate(-3px, -3px); }
+    100% { transform: translate(3px, -3px); }
 }
 
 .confetti {
@@ -95,103 +77,115 @@ button {
     }
 }
 
-#intro {
-    position: fixed;
-    inset: 0;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    z-index: 10;
+#message {
+    position: absolute;
+    top: 120px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
 }
 </style>
 </head>
 
 <body>
 
-<div id="intro">
-    Preparing something important for DVK...
-</div>
-
-<div class="container" style="display:none;" id="mainContent">
-    <h1 id="title">DVK ❤️</h1>
-    <p id="subtitle">I have one very serious question for you...</p>
-
-    <div class="buttons">
-        <button id="yesBtn">Yes 😌</button>
-        <button id="noBtn">No 😐</button>
-    </div>
-
-    <div class="message" id="dramaText"></div>
+<div class="container">
+    <h1>DVK ❤️ Will you be my Valentine?</h1>
+    <div id="message"></div>
+    <button class="yes" id="yesBtn">YES 😌</button>
+    <button class="no" id="noBtn">NO 😈</button>
 </div>
 
 <script>
-const intro = document.getElementById("intro");
-const mainContent = document.getElementById("mainContent");
-const noBtn = document.getElementById("noBtn");
+const container = document.querySelector(".container");
 const yesBtn = document.getElementById("yesBtn");
-const dramaText = document.getElementById("dramaText");
-const title = document.getElementById("title");
-const subtitle = document.getElementById("subtitle");
+const noBtn = document.getElementById("noBtn");
+const message = document.getElementById("message");
 
-let noCount = 0;
+let chaos = 0;
 
-setTimeout(() => {
-    intro.style.display = "none";
-    mainContent.style.display = "block";
-    subtitle.textContent = "Will you be my Valentine?";
-}, 2500);
-
-const dramaticLines = [
-    "DVK… that hurt.",
-    "Are you absolutely sure?",
-    "Think carefully. This is history.",
-    "I already imagined our wedding playlist.",
-    "You are pressing no with confidence.",
-    "This is becoming emotionally unsafe.",
-    "My heart just lagged.",
-    "Are you enjoying this chaos?",
-    "This feels personal.",
-    "Last chance before I start writing sad poetry."
-];
-
-function moveNoButton() {
-    noCount++;
-
-    const x = Math.random() * 200 - 100;
-    const y = Math.random() * 200 - 100;
-    noBtn.style.transform = `translate(${x}px, ${y}px)`;
-
-    if (noCount <= dramaticLines.length) {
-        dramaText.textContent = dramaticLines[noCount - 1];
-    } else {
-        dramaText.textContent = "DVK… destiny is glowing green.";
-    }
-
-    let scale = 1 + (noCount * 0.18);
-    yesBtn.style.transform = `scale(${scale})`;
-
-    document.body.classList.add("shake");
-    setTimeout(() => document.body.classList.remove("shake"), 300);
+// Position initial buttons
+function placeRandom(btn) {
+    btn.style.left = Math.random() * (window.innerWidth - 120) + "px";
+    btn.style.top = Math.random() * (window.innerHeight - 60) + "px";
 }
 
-noBtn.addEventListener("mouseenter", moveNoButton);
-noBtn.addEventListener("touchstart", function(e){
-    e.preventDefault();
-    moveNoButton();
+placeRandom(yesBtn);
+placeRandom(noBtn);
+
+// YES click wins
+yesBtn.addEventListener("click", victory);
+
+// NO click multiplies
+noBtn.addEventListener("click", () => {
+    chaos++;
+
+    document.body.classList.add("glitch");
+    setTimeout(() => document.body.classList.remove("glitch"), 300);
+
+    document.body.style.background =
+        `hsl(${Math.random()*360}, 80%, 10%)`;
+
+    message.innerHTML = getChaosMessage(chaos);
+
+    multiplyNo();
+    yesBtn.style.transform = `scale(${1 + chaos * 0.15})`;
+
+    if (chaos >= 8) {
+        turnEverythingToYes();
+    }
 });
 
-yesBtn.addEventListener("click", () => {
-    title.textContent = "I KNEW IT DVK 😭❤️";
-    subtitle.textContent = "This is the best decision of your entire existence.";
-    document.querySelector(".buttons").style.display = "none";
+function multiplyNo() {
+    const newNo = document.createElement("button");
+    newNo.innerHTML = "NO 😈";
+    newNo.className = "no";
+    placeRandom(newNo);
+    container.appendChild(newNo);
+
+    newNo.addEventListener("click", () => {
+        chaos++;
+        multiplyNo();
+        yesBtn.style.transform = `scale(${1 + chaos * 0.15})`;
+        message.innerHTML = getChaosMessage(chaos);
+
+        if (chaos >= 8) {
+            turnEverythingToYes();
+        }
+    });
+}
+
+function getChaosMessage(level) {
+    const lines = [
+        "DVK… bold move.",
+        "Oh we multiplying now?",
+        "This is chaos.",
+        "Why are there so many NOs?",
+        "You did this.",
+        "Reality is unstable.",
+        "This is spiraling.",
+        "Okay that’s enough."
+    ];
+    return lines[Math.min(level-1, lines.length-1)];
+}
+
+function turnEverythingToYes() {
+    message.innerHTML = "Nice try DVK 😌";
+    document.querySelectorAll(".no").forEach(btn => {
+        btn.className = "yes";
+        btn.innerHTML = "YES 😌";
+        btn.onclick = victory;
+    });
+}
+
+function victory() {
     document.body.style.background = "black";
+    container.innerHTML = "<h1>HAHA DVK 😌❤️<br>You were always going to say YES.</h1>";
     launchConfetti();
-});
+}
 
 function launchConfetti() {
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 200; i++) {
         const confetti = document.createElement("div");
         confetti.classList.add("confetti");
         confetti.style.left = Math.random() * 100 + "vw";
