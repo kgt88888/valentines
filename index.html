@@ -7,7 +7,6 @@
 <style>
 body {
   margin: 0;
-  padding: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #ff9ecf, #ffc3e6, #ffe6f7);
   overflow: hidden;
@@ -16,20 +15,6 @@ body {
   align-items: center;
   height: 100vh;
   text-align: center;
-}
-
-/* Floating hearts */
-.heart {
-  position: fixed;
-  bottom: -20px;
-  font-size: 20px;
-  animation: floatUp 6s linear infinite;
-  opacity: 0.7;
-}
-
-@keyframes floatUp {
-  0% { transform: translateY(0); opacity: 0.8; }
-  100% { transform: translateY(-110vh); opacity: 0; }
 }
 
 .card {
@@ -43,9 +28,6 @@ body {
   z-index: 10;
 }
 
-h1 { color: #ff4da6; }
-p { min-height: 40px; }
-
 button {
   padding: 12px 20px;
   font-size: 16px;
@@ -53,7 +35,7 @@ button {
   border: none;
   cursor: pointer;
   margin: 8px;
-  transition: 0.3s ease;
+  transition: 0.2s ease;
 }
 
 .yesBtn {
@@ -66,6 +48,36 @@ button {
   background: #444;
   color: white;
 }
+
+/* Floating hearts */
+.heart {
+  position: fixed;
+  bottom: -20px;
+  animation: floatUp 6s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 0.8; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+/* Popup messages */
+.popup {
+  position: fixed;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  font-size: 14px;
+  animation: fadeOut 4s forwards;
+  z-index: 999;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
 </style>
 </head>
 
@@ -74,33 +86,22 @@ button {
 <div class="card">
   <h1>DVK 💕</h1>
   <h2>Will you be my Valentine? 💘</h2>
-  <p id="message">Choose wisely… destiny is watching 😌</p>
+  <p id="message">Try clicking Yes… if you can 😈</p>
 
   <div id="buttonArea">
     <button class="yesBtn">Yes 💖</button>
-    <button id="noBtn">No 😈</button>
+    <button id="noBtn">No 😏</button>
   </div>
 </div>
 
 <script>
-const message = document.getElementById("message");
-const noBtn = document.getElementById("noBtn");
 const buttonArea = document.getElementById("buttonArea");
+const noBtn = document.getElementById("noBtn");
 
 let scale = 1;
-let noCount = 0;
+let hoverTime = 0;
 
-const funnyMessages = [
-  "Are you sure DVK? 🥺",
-  "My dramatic heart just cracked 💔",
-  "The universe gasped 🌌",
-  "Even my WiFi is disappointed 📶",
-  "This is emotional damage 😭",
-  "Why are you like this 😩",
-  "Plot twist loading… ⏳"
-];
-
-/* Floating Hearts Generator */
+/* Floating hearts */
 function createHeart() {
   const heart = document.createElement("div");
   heart.classList.add("heart");
@@ -109,44 +110,72 @@ function createHeart() {
   heart.style.fontSize = (Math.random() * 20 + 15) + "px";
   heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
   document.body.appendChild(heart);
-
   setTimeout(() => heart.remove(), 6000);
 }
 setInterval(createHeart, 500);
 
-/* YES button behavior */
+/* Popup messages */
+const dramaticLines = [
+  "Why are you hesitating? 😭",
+  "Commitment issues detected 🚨",
+  "The suspense is killing me 😩",
+  "My heart is buffering... ⏳",
+  "This is emotional cardio 🏃‍♂️💔",
+  "JUST CLICK IT 😈"
+];
+
+function createPopup(text) {
+  const popup = document.createElement("div");
+  popup.classList.add("popup");
+  popup.innerText = text;
+  popup.style.left = Math.random() * 80 + "vw";
+  popup.style.top = Math.random() * 80 + "vh";
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 4000);
+}
+
+/* YES behavior */
 function attachYesBehavior(btn) {
-  btn.addEventListener("mouseover", () => {
-    if (scale < 3) {
-      btn.style.left = Math.random() * 250 + "px";
-      btn.style.top = Math.random() * 150 + "px";
+
+  function dodge() {
+    const x = Math.random() * 250;
+    const y = Math.random() * 150;
+    btn.style.left = x + "px";
+    btn.style.top = y + "px";
+  }
+
+  // Desktop hover
+  btn.addEventListener("mouseover", dodge);
+
+  // Mobile touch
+  btn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    dodge();
+  });
+
+  // Track hover duration
+  btn.addEventListener("mouseenter", () => {
+    hoverTime++;
+    if (hoverTime <= dramaticLines.length) {
+      createPopup(dramaticLines[hoverTime - 1]);
     }
   });
 
   btn.addEventListener("click", () => {
     document.querySelector(".card").innerHTML = `
       <h1>🎉 YAY DVK!!! 🎉</h1>
-      <p>You have unlocked MAXIMUM LOVE MODE 💕</p>
-      <p>Prepare for snacks, chaos, and cuddles 😌💖</p>
+      <p>You defeated the chaos 💕</p>
+      <p>Maximum love mode unlocked 😌💖</p>
     `;
   });
 }
 
-/* Attach to initial YES */
 attachYesBehavior(document.querySelector(".yesBtn"));
 
 /* NO button chaos */
 noBtn.addEventListener("click", () => {
-  noCount++;
   scale += 0.3;
 
-  if (noCount <= funnyMessages.length) {
-    message.textContent = funnyMessages[noCount - 1];
-  } else {
-    message.textContent = "Okay this is getting ridiculous now 😭";
-  }
-
-  /* Multiply YES buttons */
   const newYes = document.createElement("button");
   newYes.classList.add("yesBtn");
   newYes.innerText = "Yes 💖";
@@ -157,7 +186,6 @@ noBtn.addEventListener("click", () => {
   attachYesBehavior(newYes);
   buttonArea.appendChild(newYes);
 
-  /* Make all YES buttons bigger */
   document.querySelectorAll(".yesBtn").forEach(btn => {
     btn.style.transform = `scale(${scale})`;
   });
