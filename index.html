@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Will you be my Valentine, DVK? 💘</title>
-  <meta name="description" content="Mobile-only chaotic Valentine with time-limited decoys, countdown, golden YES finale, and a romantic ending." />
+  <meta name="description" content="Mobile-only chaotic Valentine with 30s chaos countdown, decoys, and a confetti Golden YES finale that drops with a bounce." />
   <meta name="theme-color" content="#ff2e63" />
   <style>
     :root{
@@ -49,7 +49,7 @@
     .btn.no{ background: #fff; border: 2px dashed #ffb9d1; color: #6f6f7a; font-weight: 700; }
     .btn.primary{ background: var(--red); color: #fff; }
 
-    /* Countdown chip */
+    /* Chaos countdown chip */
     .chip{
       position: absolute;
       right: 12px; top: 12px;
@@ -68,6 +68,7 @@
 
     .taunt{ min-height: 36px; margin: 16px 2px 8px; font-size: clamp(14px,2.4vw,18px); color: #7a7a86; }
     .tiny{ margin-top: 18px; font-size: 12px; opacity: .65; }
+
     .overlay{
       position: fixed; inset: 0; display: grid; place-items: center;
       background: rgba(255,240,246,.88); z-index: 50; backdrop-filter: blur(3px);
@@ -88,7 +89,15 @@
       font-weight: 900;
       text-shadow: 0 1px 0 rgba(255,255,255,.5);
       box-shadow: 0 12px 24px rgba(248, 191, 60, .35), inset 0 0 0 2px rgba(255,255,255,.4);
+      /* glow only by default; floaty added after bounce finishes */
+      animation: glow 1.2s ease-in-out infinite alternate;
+    }
+    .golden-yes.floaty-on{
       animation: glow 1.2s ease-in-out infinite alternate, floaty 2.2s ease-in-out infinite;
+    }
+    .golden-yes.drop-bounce{
+      /* Play drop bounce first, keep glow during it */
+      animation: dropBounce 700ms cubic-bezier(.22,.61,.36,1) both, glow 1.2s ease-in-out infinite alternate;
     }
     @keyframes glow{
       from{ filter: drop-shadow(0 0 0 rgba(255,215,0,0.0)); }
@@ -96,6 +105,13 @@
     }
     @keyframes floaty{
       0%{ transform: translateY(0); } 50%{ transform: translateY(-4px);} 100%{ transform: translateY(0); }
+    }
+    /* Drop-from-top with bounce/overshoot */
+    @keyframes dropBounce{
+      0%   { transform: translateY(-160%) scale(0.96); opacity: 0; }
+      60%  { transform: translateY(0%) scale(1.04); opacity: 1; }
+      80%  { transform: translateY(-12%) scale(0.99); }
+      100% { transform: translateY(0%) scale(1); }
     }
 
     /* Heart particles */
@@ -107,13 +123,27 @@
     .heart::after{ left:-7px; top:0; }
     @keyframes floatUp{ 0%{opacity:0; transform: translateY(0) rotate(45deg) scale(.6);}10%{opacity:1;}100%{opacity:0; transform: translateY(-110vh) rotate(45deg) scale(1.2);} }
 
-    /* Sparkles */
+    /* Sparkles / confetti */
     .sparkle{ position:absolute; font-size:16px; animation: popUp .9s ease-out forwards; filter: drop-shadow(0 6px 12px rgba(255,0,128,.25)); }
     @keyframes popUp{ 0%{ transform: translateY(0) scale(.6) rotate(0deg); opacity:0; } 35%{opacity:1;} 100%{ transform: translateY(-80px) scale(1.2) rotate(10deg); opacity:0;} }
 
+    .confetti{
+      position: absolute;
+      width: 8px; height: 14px;
+      opacity: 0.95;
+      transform: translate(0,0) rotate(0deg);
+      animation: confettiFall linear forwards;
+      border-radius: 2px;
+    }
+    @keyframes confettiFall{
+      0%   { transform: translate(0, -20px) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+    }
+
     /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
-      .btn,.heart,.sparkle{ transition:none !important; animation:none !important; }
+      .btn,.heart,.sparkle,.confetti{ transition:none !important; animation:none !important; }
     }
     /* Mobile layout nudge */
     @media (max-width: 560px){
@@ -127,13 +157,13 @@
     <header>
       <h1>Will you be my Valentine, <span class="accent">DVK</span>? 💝</h1>
       <p class="sub">Tip: Open this on your phone for the full chaos. 😏</p>
-      <p id="desktopHint" class="hint" hidden>Hint: You’re on desktop—mobile has extra mischief.</p>
+      <p id="desktopHint" class="hint" hidden>Hint: You’re on desktop—golden YES will appear to confirm.</p>
     </header>
 
-    <!-- Countdown chip (shown during chaos on mobile) -->
+    <!-- Chaos countdown chip (shown during chaos on mobile) -->
     <div id="decoyChip" class="chip" hidden>
       <span class="dot" aria-hidden="true"></span>
-      <span>Decoys vanish in <strong id="chipTime">0:45</strong>…</span>
+      <span>Chaos countdown: <strong id="chipTime">0:30</strong></span>
     </div>
 
     <section class="buttons" id="buttonsArea">
@@ -169,7 +199,7 @@
 
   <script>
     /* ==============================
-       Mobile-only Chaos + 45s Decoys + Countdown + Golden YES + Extra Snark
+       Mobile-only Chaos + 30s Chaos Countdown + Golden YES with Drop-Bounce + Confetti (ONLY confirm)
     ================================*/
 
     // ---- Capability / mobile gating ----
@@ -184,11 +214,11 @@
 
     // ---- Config ----
     const YES_FAST_MS         = 6000;     // YES before this -> fake on mobile
-    const MISCHIEF_MIN_MS     = 9000;     // Minimum chaos time to "earn" real YES
-    const REQUIRED_TAUNTS     = 6;        // Taunts needed before real YES unlocks
+    const MISCHIEF_MIN_MS     = 9000;     // Minimum chaos time to "earn" real YES (for messaging only)
+    const REQUIRED_TAUNTS     = 6;        // Taunts needed before we "allow" golden YES (normal YES never confirms)
 
     const DECOY_INTERVAL_MS   = 1000;     // continuous decoy spawns during chaos (mobile)
-    const DECOY_DURATION_MS   = 45000;    // ⏱️ total time decoys are allowed
+    const DECOY_DURATION_MS   = 30000;    // ⏱️ total time decoys are allowed (30s)
     const MAX_DECOYS          = 18;       // cap for performance
     const JITTER_MS           = 360;      // jiggle speed during chaos (mobile)
 
@@ -268,6 +298,31 @@
       }
     }
 
+    /* ---------- Fun confetti burst ---------- */
+    function confettiBurst(x, y, count = 80){
+      const colors = ['#ff2e63','#f7b500','#00d1b2','#8257e6','#ff6fa3','#ffd166','#06d6a0','#118ab2'];
+      for (let i=0;i<count;i++){
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        const color = colors[Math.floor(Math.random()*colors.length)];
+        const dx = (Math.random()*2-1) * (80 + Math.random()*120);
+        const dy = (120 + Math.random()*200);
+        const rot = (Math.random()*720 - 360) + 'deg';
+        const dur = 1200 + Math.random()*900; // ms
+        c.style.left = (x + (Math.random()*40 - 20)) + 'px';
+        c.style.top  = (y + (Math.random()*20 - 10)) + 'px';
+        c.style.background = color;
+        c.style.setProperty('--dx', dx + 'px');
+        c.style.setProperty('--dy', dy + 'px');
+        c.style.setProperty('--rot', rot);
+        c.style.animationDuration = dur + 'ms';
+        const w = 6 + Math.random()*5, h = 10 + Math.random()*8;
+        c.style.width = w + 'px'; c.style.height = h + 'px';
+        sparkles.appendChild(c);
+        setTimeout(()=> c.remove(), dur + 100);
+      }
+    }
+
     /* ---------- NO: exponential growth ---------- */
     function updateNoGrowth(){
       const seconds = timeElapsedMs() / 1000;
@@ -308,7 +363,7 @@
       tauntsShown++;
       tauntEl.textContent = msg;
 
-      // Spawn a decoy on every taunt during chaos (mobile only; within 45s window)
+      // Spawn a decoy on every taunt during chaos (mobile only; within 30s window)
       if (IS_MOBILE && mischief && decoyWindowActive()) spawnDecoyNear(yesBtn, randomYesLabel());
     }
 
@@ -321,7 +376,7 @@
       el.style.top  = (Math.random()*maxTop) + 'px';
       el.style.transition = 'top .18s ease, left .18s ease, transform .12s ease';
 
-      // Spawn a decoy on every scramble during chaos (mobile only; within 45s)
+      // Spawn a decoy on every scramble during chaos (mobile only; within 30s)
       if (IS_MOBILE && mischief && decoyWindowActive()) spawnDecoyNear(el, randomYesLabel());
     }
 
@@ -336,7 +391,7 @@
     function startJitter(){ if (!IS_MOBILE) return; if (!jitterTimer) jitterTimer = setInterval(jitter, JITTER_MS); }
     function stopJitter(){ if (jitterTimer){ clearInterval(jitterTimer); jitterTimer = null; } }
 
-    /* ---------- Decoy lifecycle control (45s window) ---------- */
+    /* ---------- Decoy lifecycle control (30s window) ---------- */
     function decoyWindowActive(){
       if (!mischiefStart) return false;
       return (performance.now() - mischiefStart) < DECOY_DURATION_MS;
@@ -357,16 +412,15 @@
     function stopDecoyInterval(){ if (decoyIntervalId){ clearInterval(decoyIntervalId); decoyIntervalId = null; } }
 
     function scheduleDecoyWindowEnd(){
-      // Hard stop after 45s: stop spawns, remove decoys, show golden YES
+      // Hard stop after 30s: stop spawns, remove decoys, show golden YES with confetti + drop-bounce
       if (decoyEndTimeoutId) clearTimeout(decoyEndTimeoutId);
       decoyEndTimeoutId = setTimeout(()=>{
         stopDecoyInterval();
-        // remove existing decoys
         decoys.forEach(d=> d.remove());
         decoys = [];
         showTaunt("Okay, chaos cooldown engaged. The decoys have clocked out. 🕒");
         stopCountdownChip();
-        spawnGoldenYes(); // 🌟 Dramatic single YES
+        spawnGoldenYes(true); // 🌟 Dramatic single YES with confetti & bounce
       }, DECOY_DURATION_MS);
     }
 
@@ -387,7 +441,7 @@
 
       // Evasive behavior (mobile events)
       ['touchstart','pointerdown','mouseenter'].forEach(evt=>{
-        yesBtn.addEventListener(evt, (e)=>{ if (!allowRealYes){ scramble(yesBtn); const t=e.touches?.[0]; sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0); showTaunt(); } }, {passive:true});
+        yesBtn.addEventListener(evt, (e)=>{ scramble(yesBtn); const t=e.touches?.[0]; sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0); showTaunt(); }, {passive:true});
         noBtn.addEventListener(evt, ()=>{ scramble(noBtn); }, {passive:true});
       });
 
@@ -398,7 +452,7 @@
       scheduleDecoyWindowEnd();
       startCountdownChip();
 
-      // Unlock flow after time+taunts
+      // Messaging unlock after time+taunts (golden YES still only confirm)
       const remainingFast = Math.max(0, YES_FAST_MS - timeElapsedMs());
       const minChaos = Math.max(MISCHIEF_MIN_MS, remainingFast);
       setTimeout(maybeUnlockRealYes, minChaos);
@@ -408,13 +462,13 @@
       if (!IS_MOBILE){ allowRealYes = true; return; }
       if (tauntsShown >= REQUIRED_TAUNTS){
         allowRealYes = true;
-        tauntEl.textContent = "Cupid has verified your vibes. Real YES unlocked! 💘";
+        tauntEl.textContent = "Cupid has verified your vibes. Watch for the golden YES. 💘";
       } else {
         const chk = setInterval(()=>{
           if (tauntsShown >= REQUIRED_TAUNTS){
             clearInterval(chk);
             allowRealYes = true;
-            tauntEl.textContent = "Okay—you earned it. The REAL YES awaits. 💞";
+            tauntEl.textContent = "Okay—you earned it. The golden YES will appear. 💞";
           }
         }, 700);
       }
@@ -423,7 +477,7 @@
     /* ---------- Decoys ---------- */
     function spawnDecoyNear(anchorEl, label="YES 💖"){
       if (!IS_MOBILE) return;
-      if (!decoyWindowActive()) return; // Only inside the 45s window
+      if (!decoyWindowActive()) return; // Only inside the 30s window
       if (decoys.length >= MAX_DECOYS) return;
 
       const d = document.createElement('button');
@@ -445,8 +499,8 @@
     function positionDecoy(anchorEl, d){
       const a = anchorEl.getBoundingClientRect();
       const area = buttons.getBoundingClientRect();
-      const left = clamp(a.left - area.left + rand(-90, 90), 0, area.width - Math.max(100, a.width*0.9));
-      const top  = clamp(a.top  - area.top  + rand(-60, 80), 0, area.height - Math.max(60, a.height*0.9));
+      const left = clamp(a.left - area.left + (Math.random()*180-90), 0, area.width - Math.max(100, a.width*0.9));
+      const top  = clamp(a.top  - area.top  + (Math.random()*140-60), 0, area.height - Math.max(60, a.height*0.9));
       d.style.left = left + 'px';
       d.style.top  = top  + 'px';
     }
@@ -464,7 +518,6 @@
       });
 
       d.addEventListener('click', (e)=>{
-        // Fake click -> taunt + sparkle
         e.preventDefault();
         const t = e.touches?.[0];
         sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0);
@@ -473,31 +526,52 @@
       });
     }
 
-    /* ---------- Golden YES Finale ---------- */
-    function spawnGoldenYes(){
-      // Make sure it only appears once, at the end of the decoy window
+    /* ---------- Golden YES Finale (ONLY confirm) ---------- */
+    function spawnGoldenYes(withConfetti = false){
       if (goldenYesBtn) return;
-      allowRealYes = true; // You earned it ✨
+      allowRealYes = true; // for messaging
 
       goldenYesBtn = document.createElement('button');
       goldenYesBtn.id = 'goldenYes';
-      goldenYesBtn.className = 'btn yes golden-yes floating';
+      goldenYesBtn.className = 'btn yes golden-yes floating drop-bounce'; // start with drop-bounce
       goldenYesBtn.textContent = 'YES ✨';
       goldenYesBtn.setAttribute('aria-label','The real, golden YES');
-
       buttons.appendChild(goldenYesBtn);
 
-      // Center it
+      // Center it within the buttons area
       const area = buttons.getBoundingClientRect();
-      goldenYesBtn.style.left = (area.width/2 - 70) + 'px';
-      goldenYesBtn.style.top  = (area.height/2 - 26) + 'px';
+      const centerX = area.left + area.width/2;
+      const centerY = area.top + area.height/2;
+      const targetLeft = (area.width/2 - 70);
+      const targetTop  = (area.height/2 - 26);
+      goldenYesBtn.style.left = targetLeft + 'px';
+      goldenYesBtn.style.top  = targetTop  + 'px';
+
+      // Disable the normal YES so golden is the ONLY path
+      yesBtn.disabled = true;
+
+      // Confetti + sparkles on appear
+      if (withConfetti){
+        confettiBurst(centerX, centerY, 90);
+        sparkleBurst(centerX, centerY);
+      } else {
+        confettiBurst(centerX, centerY, 70);
+      }
+
+      // After drop-bounce ends, enable floaty-on loop
+      goldenYesBtn.addEventListener('animationend', (e)=>{
+        if (e.animationName === 'dropBounce'){
+          goldenYesBtn.classList.remove('drop-bounce');
+          goldenYesBtn.classList.add('floaty-on');
+        }
+      });
 
       // Click -> real celebrate
       goldenYesBtn.addEventListener('click', ()=>{
         celebrate();
         clearInterval(growthInterval);
         tauntEl.textContent = "You. Me. Always. 💗";
-        yesBtn.disabled = true; noBtn.disabled = true;
+        noBtn.disabled = true;
       });
     }
 
@@ -526,6 +600,7 @@
     function celebrate(){
       overlay.hidden = false;
       spawnHearts(110);
+      confettiBurst(innerWidth/2, innerHeight*0.3, 80);
       stopJitter(); stopDecoyInterval(); stopCountdownChip();
       if (decoyEndTimeoutId) { clearTimeout(decoyEndTimeoutId); decoyEndTimeoutId = null; }
       if (goldenYesBtn) goldenYesBtn.classList.remove('floating');
@@ -534,35 +609,27 @@
 
     /* ---------- Click Logic ---------- */
     yesBtn.addEventListener('click', (e)=>{
-      // Desktop: simple accept (no chaos)
+      // DESKTOP: do NOT accept — spawn golden YES immediately so it's the ONLY confirmation
       if (!IS_MOBILE){
-        celebrate();
-        clearInterval(growthInterval);
-        tauntEl.textContent = "You. Me. Always. 💗";
-        yesBtn.disabled = true; noBtn.disabled = true;
+        if (!goldenYesBtn) {
+          spawnGoldenYes(true); // spawn with confetti + bounce on desktop too
+          tauntEl.textContent = "Tap the golden YES to confirm. ✨";
+        }
         return;
       }
 
-      // Mobile: gate real YES behind chaos
+      // MOBILE: normal YES never confirms — it only triggers chaos / decoys
       const elapsed = timeElapsedMs();
-      if (!allowRealYes){
-        if (elapsed < YES_FAST_MS || mischief){
-          showTaunt("Too quick, speedster. That was a tutorial YES. 😏");
-          startMischief();
-          scramble(yesBtn);
-          const t = e.touches?.[0];
-          sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0);
-          return;
-        }
-      }
+      if (!mischief) startMischief();
 
-      // Real YES (mobile)
-      celebrate();
-      clearInterval(growthInterval);
-      tauntEl.textContent = "You. Me. Always. 💗";
-      yesBtn.disabled = true; noBtn.disabled = true;
-      decoys.forEach(d=> d.remove()); decoys = [];
-      if (goldenYesBtn) goldenYesBtn.remove();
+      const t = e.touches?.[0];
+      sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0);
+      if (elapsed < YES_FAST_MS){
+        showTaunt("Too quick, speedster. That was a tutorial YES. 😏");
+      } else {
+        showTaunt("Patience. The golden YES will appear when the stars align. ✨");
+      }
+      scramble(yesBtn);
     });
 
     noBtn.addEventListener('click', ()=>{
@@ -582,3 +649,4 @@
   </script>
 </body>
 </html>
+``
