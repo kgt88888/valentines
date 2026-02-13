@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVK ❤️ Be Mine</title>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Georgia, serif;
+    background: linear-gradient(180deg, #ff4e50, #1c1c1c);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    color: white;
+}
+
+.container {
+    width: 90%;
+    max-width: 400px;
+}
+
+h1 {
+    font-size: 1.8rem;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+button {
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#yesBtn {
+    background: #00ff88;
+    color: black;
+    font-weight: bold;
+}
+
+#noBtn {
+    background: #444;
+    color: white;
+}
+
+.message {
+    margin-top: 20px;
+    min-height: 40px;
+}
+
+.confetti {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    top: 0;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>DVK ❤️</h1>
+    <p>Will you be my Valentine?</p>
+
+    <div class="buttons">
+        <button id="yesBtn">Yes 😌</button>
+        <button id="noBtn">No 😐</button>
+    </div>
+
+    <div class="message" id="dramaText"></div>
+</div>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const dramaText = document.getElementById("dramaText");
+
+let noCount = 0;
+
+const dramaticLines = [
+    "DVK… that hurt.",
+    "Are you sure?",
+    "I already told people we’re iconic.",
+    "This is getting dramatic.",
+    "You’re pressing no like it’s sponsored.",
+    "Do you enjoy chaos, DVK?",
+    "Last chance before I write poetry about this."
+];
+
+function moveNoButton() {
+    const x = Math.random() * 150 - 75;
+    const y = Math.random() * 150 - 75;
+
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+
+    noCount++;
+
+    if (noCount <= dramaticLines.length) {
+        dramaText.textContent = dramaticLines[noCount - 1];
+    } else {
+        dramaText.textContent = "DVK… the Yes button is your destiny.";
+    }
+
+    let scale = 1 + (noCount * 0.15);
+    yesBtn.style.transform = `scale(${scale})`;
+}
+
+noBtn.addEventListener("mouseenter", moveNoButton);
+noBtn.addEventListener("touchstart", function(e){
+    e.preventDefault();
+    moveNoButton();
+});
+
+yesBtn.addEventListener("click", () => {
+    document.querySelector("h1").textContent = "I KNEW IT DVK 😭❤️";
+    dramaText.textContent = "Best decision ever.";
+    document.querySelector(".buttons").style.display = "none";
+    launchConfetti();
+});
+
+function launchConfetti() {
+    for (let i = 0; i < 120; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+    }
+}
+</script>
+
+</body>
+</html>
