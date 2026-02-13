@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Will you be my Valentine, DVK? 💘</title>
-  <meta name="description" content="Mobile-only chaotic Valentine with 30s chaos countdown, decoys, and a confetti Golden YES finale that drops with a bounce." />
+  <meta name="description" content="Mobile-only chaotic Valentine with 30s chaos countdown, decoys, golden YES finale with confetti drop-bounce, and extra snark." />
   <meta name="theme-color" content="#ff2e63" />
   <style>
     :root{
@@ -89,14 +89,12 @@
       font-weight: 900;
       text-shadow: 0 1px 0 rgba(255,255,255,.5);
       box-shadow: 0 12px 24px rgba(248, 191, 60, .35), inset 0 0 0 2px rgba(255,255,255,.4);
-      /* glow only by default; floaty added after bounce finishes */
       animation: glow 1.2s ease-in-out infinite alternate;
     }
     .golden-yes.floaty-on{
       animation: glow 1.2s ease-in-out infinite alternate, floaty 2.2s ease-in-out infinite;
     }
     .golden-yes.drop-bounce{
-      /* Play drop bounce first, keep glow during it */
       animation: dropBounce 700ms cubic-bezier(.22,.61,.36,1) both, glow 1.2s ease-in-out infinite alternate;
     }
     @keyframes glow{
@@ -106,7 +104,6 @@
     @keyframes floaty{
       0%{ transform: translateY(0); } 50%{ transform: translateY(-4px);} 100%{ transform: translateY(0); }
     }
-    /* Drop-from-top with bounce/overshoot */
     @keyframes dropBounce{
       0%   { transform: translateY(-160%) scale(0.96); opacity: 0; }
       60%  { transform: translateY(0%) scale(1.04); opacity: 1; }
@@ -199,7 +196,8 @@
 
   <script>
     /* ==============================
-       Mobile-only Chaos + 30s Chaos Countdown + Golden YES with Drop-Bounce + Confetti (ONLY confirm)
+       Mobile-only Chaos + 30s Chaos Countdown + Golden YES (drop-bounce + confetti, ONLY confirm)
+       + Extra Snark (including on decoy taps)
     ================================*/
 
     // ---- Capability / mobile gating ----
@@ -214,8 +212,8 @@
 
     // ---- Config ----
     const YES_FAST_MS         = 6000;     // YES before this -> fake on mobile
-    const MISCHIEF_MIN_MS     = 9000;     // Minimum chaos time to "earn" real YES (for messaging only)
-    const REQUIRED_TAUNTS     = 6;        // Taunts needed before we "allow" golden YES (normal YES never confirms)
+    const MISCHIEF_MIN_MS     = 9000;     // For messaging only
+    const REQUIRED_TAUNTS     = 6;        // For messaging only
 
     const DECOY_INTERVAL_MS   = 1000;     // continuous decoy spawns during chaos (mobile)
     const DECOY_DURATION_MS   = 30000;    // ⏱️ total time decoys are allowed (30s)
@@ -249,7 +247,7 @@
     let mischiefStart = null;
     let goldenYesBtn = null;
 
-    // Extra snarky one-liners
+    // Extra snarky one-liners (general chaos)
     const TAUNTS = [
       "Speedrun detected. Any% is banned in this category. 🏁",
       "You can’t cookie-popup YES your way into love. 🍪",
@@ -275,6 +273,25 @@
       "Hint: Smiling unlocks hidden dialogue options. 😉",
       "Your taps are cute, but your yes will be cuter. 💞",
       "All roads lead to YES. Some just go scenic. 🌸",
+    ];
+
+    // 🔥 Snark specifically for DECOY taps
+    const DECOY_SNARKS = [
+      "Decoy tapped: +1 to your mischievous stats. 😈",
+      "Fake YES speedrun PB achieved. New goal: golden YES. 🏅",
+      "You caught a shiny… decoy. Try again. ✨",
+      "Oops—all decoys! Limited edition chaos. 🌪️",
+      "That YES was 100% certified impostor. 🥸",
+      "Plot twist: That button is emotionally unavailable. 🙃",
+      "Decoy says: ‘It’s not you, it’s me.’ (it’s you). 😉",
+      "Nice click. Wrong universe. Multiverse says hi. 🌌",
+      "Close enough to be adorable, not enough to be golden. 💛",
+      "CIA has flagged you as a button chaser. 🕵️",
+      "That was a tutorial YES. The final boss is golden. 👑",
+      "Decoy: 1 | You: still cute. Try again. 💘",
+      "Eligibility check failed: Must be grinning more. 😁",
+      "Decoy giggles and runs away. Coward. 🐭",
+      "You’ve unlocked: Bamboozled (Common). 🧩",
     ];
 
     // Utils
@@ -336,7 +353,7 @@
     function startCountdownChip(){
       if (!IS_MOBILE) return;
       chip.hidden = false;
-      updateChipTime(); // immediate
+      updateChipTime();
       if (chipTimerId) clearInterval(chipTimerId);
       chipTimerId = setInterval(updateChipTime, 1000);
     }
@@ -363,7 +380,6 @@
       tauntsShown++;
       tauntEl.textContent = msg;
 
-      // Spawn a decoy on every taunt during chaos (mobile only; within 30s window)
       if (IS_MOBILE && mischief && decoyWindowActive()) spawnDecoyNear(yesBtn, randomYesLabel());
     }
 
@@ -376,7 +392,6 @@
       el.style.top  = (Math.random()*maxTop) + 'px';
       el.style.transition = 'top .18s ease, left .18s ease, transform .12s ease';
 
-      // Spawn a decoy on every scramble during chaos (mobile only; within 30s)
       if (IS_MOBILE && mischief && decoyWindowActive()) spawnDecoyNear(el, randomYesLabel());
     }
 
@@ -412,7 +427,6 @@
     function stopDecoyInterval(){ if (decoyIntervalId){ clearInterval(decoyIntervalId); decoyIntervalId = null; } }
 
     function scheduleDecoyWindowEnd(){
-      // Hard stop after 30s: stop spawns, remove decoys, show golden YES with confetti + drop-bounce
       if (decoyEndTimeoutId) clearTimeout(decoyEndTimeoutId);
       decoyEndTimeoutId = setTimeout(()=>{
         stopDecoyInterval();
@@ -420,7 +434,7 @@
         decoys = [];
         showTaunt("Okay, chaos cooldown engaged. The decoys have clocked out. 🕒");
         stopCountdownChip();
-        spawnGoldenYes(true); // 🌟 Dramatic single YES with confetti & bounce
+        spawnGoldenYes(true); // confetti + bounce
       }, DECOY_DURATION_MS);
     }
 
@@ -430,7 +444,7 @@
     }
 
     function startMischief(){
-      if (!IS_MOBILE) return; // 🔒 Chaos is mobile-only
+      if (!IS_MOBILE) return; // mobile-only chaos
       if (mischief) return;
       mischief = true;
       tauntsShown = 0;
@@ -439,20 +453,17 @@
       yesBtn.classList.add('floating'); noBtn.classList.add('floating');
       scramble(yesBtn); scramble(noBtn);
 
-      // Evasive behavior (mobile events)
       ['touchstart','pointerdown','mouseenter'].forEach(evt=>{
         yesBtn.addEventListener(evt, (e)=>{ scramble(yesBtn); const t=e.touches?.[0]; sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0); showTaunt(); }, {passive:true});
         noBtn.addEventListener(evt, ()=>{ scramble(noBtn); }, {passive:true});
       });
 
-      // Initial decoy burst & continuous spawning (within window)
       spawnDecoyNear(yesBtn, "YES 💖 (trust me)");
       startJitter();
       startDecoyInterval();
       scheduleDecoyWindowEnd();
       startCountdownChip();
 
-      // Messaging unlock after time+taunts (golden YES still only confirm)
       const remainingFast = Math.max(0, YES_FAST_MS - timeElapsedMs());
       const minChaos = Math.max(MISCHIEF_MIN_MS, remainingFast);
       setTimeout(maybeUnlockRealYes, minChaos);
@@ -477,7 +488,7 @@
     /* ---------- Decoys ---------- */
     function spawnDecoyNear(anchorEl, label="YES 💖"){
       if (!IS_MOBILE) return;
-      if (!decoyWindowActive()) return; // Only inside the 30s window
+      if (!decoyWindowActive()) return;
       if (decoys.length >= MAX_DECOYS) return;
 
       const d = document.createElement('button');
@@ -489,10 +500,8 @@
       hookDecoy(d);
       decoys.push(d);
 
-      // Each decoy self-destructs when the window ends
       const ttl = timeLeftInDecoyWindow();
       setTimeout(()=> { if (d.isConnected) d.remove(); decoys = decoys.filter(x=>x!==d); }, ttl);
-
       return d;
     }
 
@@ -510,18 +519,23 @@
         d.addEventListener(evt, (e)=>{
           e.preventDefault(); e.stopPropagation();
           scramble(d);
-          // Spawn a friend (cascade) on interaction if below cap and within window
           if (decoyWindowActive() && decoys.length < MAX_DECOYS && Math.random() > 0.35){
             spawnDecoyNear(d, randomYesLabel());
           }
         }, {passive:true});
       });
 
+      // 👇 Snark on decoy tap
       d.addEventListener('click', (e)=>{
         e.preventDefault();
         const t = e.touches?.[0];
-        sparkleBurst((t?.clientX??e.clientX)||0, (t?.clientY??e.clientY)||0);
-        showTaunt("Decoy detected. You’ve been adorably bamboozled. 😜");
+        const x = (t?.clientX??e.clientX)||0, y = (t?.clientY??e.clientY)||0;
+        sparkleBurst(x, y);
+        // Vibrate slightly on supported devices (harmless/no-op otherwise)
+        if (navigator.vibrate) { navigator.vibrate(12); }
+        // Pick a random snark just for decoy taps
+        const snark = DECOY_SNARKS[Math.floor(Math.random()*DECOY_SNARKS.length)];
+        tauntEl.textContent = snark;
         scramble(d);
       });
     }
@@ -533,12 +547,11 @@
 
       goldenYesBtn = document.createElement('button');
       goldenYesBtn.id = 'goldenYes';
-      goldenYesBtn.className = 'btn yes golden-yes floating drop-bounce'; // start with drop-bounce
+      goldenYesBtn.className = 'btn yes golden-yes floating drop-bounce';
       goldenYesBtn.textContent = 'YES ✨';
       goldenYesBtn.setAttribute('aria-label','The real, golden YES');
       buttons.appendChild(goldenYesBtn);
 
-      // Center it within the buttons area
       const area = buttons.getBoundingClientRect();
       const centerX = area.left + area.width/2;
       const centerY = area.top + area.height/2;
@@ -547,10 +560,8 @@
       goldenYesBtn.style.left = targetLeft + 'px';
       goldenYesBtn.style.top  = targetTop  + 'px';
 
-      // Disable the normal YES so golden is the ONLY path
-      yesBtn.disabled = true;
+      yesBtn.disabled = true; // only golden can confirm
 
-      // Confetti + sparkles on appear
       if (withConfetti){
         confettiBurst(centerX, centerY, 90);
         sparkleBurst(centerX, centerY);
@@ -558,7 +569,6 @@
         confettiBurst(centerX, centerY, 70);
       }
 
-      // After drop-bounce ends, enable floaty-on loop
       goldenYesBtn.addEventListener('animationend', (e)=>{
         if (e.animationName === 'dropBounce'){
           goldenYesBtn.classList.remove('drop-bounce');
@@ -566,7 +576,6 @@
         }
       });
 
-      // Click -> real celebrate
       goldenYesBtn.addEventListener('click', ()=>{
         celebrate();
         clearInterval(growthInterval);
@@ -609,10 +618,10 @@
 
     /* ---------- Click Logic ---------- */
     yesBtn.addEventListener('click', (e)=>{
-      // DESKTOP: do NOT accept — spawn golden YES immediately so it's the ONLY confirmation
+      // DESKTOP: spawn golden YES immediately (only confirmation path)
       if (!IS_MOBILE){
         if (!goldenYesBtn) {
-          spawnGoldenYes(true); // spawn with confetti + bounce on desktop too
+          spawnGoldenYes(true);
           tauntEl.textContent = "Tap the golden YES to confirm. ✨";
         }
         return;
@@ -639,14 +648,11 @@
       if (IS_MOBILE && mischief) scramble(noBtn);
     });
 
-    // Trigger chaos if they poke the YES (mobile) even before clicking
     ['touchstart','pointerdown'].forEach(evt=>{
       yesBtn.addEventListener(evt, ()=>{ if (IS_MOBILE) startMischief(); }, {passive:true});
     });
 
-    // Tiny teaser sparkle
     setTimeout(()=> sparkleBurst(innerWidth*0.6, innerHeight*0.3), 600);
   </script>
 </body>
 </html>
-``
